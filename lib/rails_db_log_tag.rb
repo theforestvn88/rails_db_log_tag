@@ -41,11 +41,12 @@ module RailsDbLogTag
     def sql(event)
       if RailsDbLogTag.enable
         # TODO: 
-        # + ignore SCHEMA
         # + cache
         #
         name = event.payload[:name]
-        unless (prefix_tags = concat_log_tags).empty?
+        schema_or_explain = ActiveRecord::LogSubscriber::IGNORE_PAYLOAD_NAMES.include?(name)
+        prefix_tags = concat_log_tags
+        unless schema_or_explain || prefix_tags.empty?
           event.payload[:name] = "#{prefix_tags} #{name}"
         end
       end
