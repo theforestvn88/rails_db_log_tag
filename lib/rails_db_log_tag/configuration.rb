@@ -14,8 +14,8 @@ module RailsDbLogTag
       @log_tags = []
     end
 
-    def prepend_db_current_role
-      @log_tags << Factory.db_current_role_tag
+    def prepend_db_current_role(format_tag="[role: %s]")
+      @log_tags << Factory.db_current_role_tag(format_tag)
     end
   end
 end

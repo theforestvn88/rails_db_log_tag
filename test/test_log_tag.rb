@@ -42,6 +42,7 @@ class LogTagTest < ActiveSupport::TestCase
     Person.first
     wait
     assert_match(/role: writing/, @logger.logged(:debug).last)
+    assert_no_match(/db writing/, @logger.logged(:debug).last)
   end
 
   def test_ignore_explain_sql
@@ -53,5 +54,17 @@ class LogTagTest < ActiveSupport::TestCase
     Person.all.explain
     wait
     assert_no_match(/EXPLAIN/, @logger.logged(:debug).last)
+  end
+
+  def test_format_db_current_role_tag
+    RailsDbLogTag.enable = true
+    RailsDbLogTag.config do |config|
+      config.prepend_db_current_role "db %s"
+    end
+
+    Person.first
+    wait
+    assert_no_match(/role: writing/, @logger.logged(:debug).last)
+    assert_match(/db writing/, @logger.logged(:debug).last)
   end
 end
