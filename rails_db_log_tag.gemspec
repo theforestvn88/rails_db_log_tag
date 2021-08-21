@@ -12,11 +12,11 @@ Gem::Specification.new do |s|
 
   #### Dependencies and requirements.
 
-  s.add_runtime_dependency 'activerecord', '>= 5.0'
+  s.add_runtime_dependency 'activerecord',  '>= 5.0'
+  s.add_runtime_dependency 'activesupport', '>= 5.0'
 
   s.add_development_dependency 'minitest'
   s.add_development_dependency 'rake'
-  s.add_development_dependency 'activesupport'
 
   #### Which files are to be included in this gem?
   s.files = Dir[

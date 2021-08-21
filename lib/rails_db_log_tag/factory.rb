@@ -3,8 +3,8 @@
 module RailsDbLogTag
   class Factory
     class << self
-      def db_role_tag
-        "[role: #{ActiveRecord::Base.current_role}]"
+      def db_current_role_tag
+        -> { "[role: #{ActiveRecord::Base.current_role}]" }
       end
     end
   end
