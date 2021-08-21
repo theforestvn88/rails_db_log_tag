@@ -67,4 +67,27 @@ class LogTagTest < ActiveSupport::TestCase
     assert_no_match(/role: writing/, @logger.logged(:debug).last)
     assert_match(/db writing/, @logger.logged(:debug).last)
   end
+
+  # DYNAMIC TEST CASES
+  
+  def test_dynamic_query_tag1
+    RailsDbLogTag.enable = true
+
+    Person.log_tag("Usecase-6").count
+    wait
+    assert_match(/Usecase-6/, @logger.logged(:debug).last)
+  end
+
+  def test_dynamic_query_tag2
+    Person.log_tag("Usecase-6").where(name: 'bob').first
+    wait
+    assert_match(/Usecase-6/, @logger.logged(:debug).last) 
+  end
+
+  def test_not_using_dynamic_query_tag
+    RailsDbLogTag.enable = true
+    Person.count
+    wait
+    assert_no_match(/Usecase-6/, @logger.logged(:debug).last)
+  end
 end
