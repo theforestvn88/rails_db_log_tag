@@ -4,12 +4,12 @@ module ActiveRecord
   module ConnectionAdapters
     class AbstractAdapter
 
-      Tags_Regex = /\/\*(.*)\*\//
+      Tags_Regex = /\/\* log_tag:(.*) \*\//
 
       alias_method(:origin_log, :log)
       def log(sql, name = 'SQL', binds = [], type_casted_binds = [], statement_name = nil, &block)
         unless ActiveRecord::LogSubscriber::IGNORE_PAYLOAD_NAMES.include?(name)
-          tags = sql.scan(Tags_Regex).map(&:first).map(&:strip).join(" ")
+          tags = sql.scan(Tags_Regex).map(&:first).join(" ")
           name = "#{tags} #{name}"
         end
 
@@ -35,7 +35,7 @@ module ActiveRecord
     #       end
     #
     def log_tag(tag_name)        
-      self.annotate_values = [tag_name]
+      self.annotate_values = ["log_tag:#{tag_name}"]
       self
     end
   end

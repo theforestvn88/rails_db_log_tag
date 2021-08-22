@@ -84,6 +84,12 @@ class LogTagTest < ActiveSupport::TestCase
     assert_match(/Usecase-6/, @logger.logged(:debug).last) 
   end
 
+  def test_dynamic_query_tag3
+    Person.annotate("annotation").where(name: 'bob').first
+    wait
+    assert_match(/\/\* annotation \*\//, @logger.logged(:debug).last) 
+  end
+
   def test_not_using_dynamic_query_tag
     RailsDbLogTag.enable = true
     Person.count
