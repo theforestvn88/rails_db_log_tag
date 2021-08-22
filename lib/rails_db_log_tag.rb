@@ -4,7 +4,6 @@ require_relative "rails_db_log_tag/configuration"
 require_relative "rails_db_log_tag/dynamic_query_tag"
 
 module RailsDbLogTag
-  # include DynamicQueryTag
   extend ActiveSupport::Concern
   
   # global setting
@@ -31,10 +30,6 @@ module RailsDbLogTag
     # end
   end
 
-  def concat_log_tags
-    RailsDbLogTag.configuration.log_tags.map(&:call).join(" ")
-  end
-
   included do
     alias_method :origin_sql, :sql
     def sql(event)
@@ -42,16 +37,37 @@ module RailsDbLogTag
         # TODO: 
         # + cache
         #
-        name = event.payload[:name]
-        schema_or_explain = ActiveRecord::LogSubscriber::IGNORE_PAYLOAD_NAMES.include?(name)
-        prefix_tags = concat_log_tags
-        unless schema_or_explain || prefix_tags.empty?
-          event.payload[:name] = "#{prefix_tags} #{name}"
+        begin
+          concat_log_tags(event)
+          parse_annotations_as_dynamic_tags(event)
+        rescue => e
         end
       end
       
       origin_sql(event)
     end
+
+    private
+
+      def parse_annotations_as_dynamic_tags(event)
+        unless schema_or_explain?(event)
+          tags = event.payload[:sql].scan(ActiveRecord::Relation::Tags_Regex).map(&:first).join(" ")
+          event.payload[:name] = "#{tags} #{event.payload[:name]}"
+        end
+
+        event.payload[:sql] = event.payload[:sql].gsub(ActiveRecord::Relation::Tags_Regex, "")
+      end
+
+      def concat_log_tags(event)
+        prefix_tags = RailsDbLogTag.configuration.log_tags.map(&:call).join(" ")
+        unless schema_or_explain?(event) || prefix_tags.empty?
+          event.payload[:name] = "#{prefix_tags} #{event.payload[:name]}"
+        end
+      end
+
+      def schema_or_explain?(event)
+        ActiveRecord::LogSubscriber::IGNORE_PAYLOAD_NAMES.include?(event.payload[:name])
+      end
   end
 end
 
