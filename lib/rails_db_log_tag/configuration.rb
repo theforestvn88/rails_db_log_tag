@@ -18,8 +18,8 @@ module RailsDbLogTag
       @log_tags << Factory.fixed_prefix_tag(tag)
     end
 
-    def prepend_db_current_role(format_tag="[role: %s]")
-      @log_tags << Factory.db_current_role_tag(format_tag)
+    def prepend_db_role(format_tag="[role: %s]")
+      @log_tags << Factory.db_role_tag(format_tag)
     end
   end
 end

@@ -7,7 +7,7 @@ module RailsDbLogTag
         Proc.new { "#{tag}" }
       end
 
-      def db_current_role_tag(format_tag)
+      def db_role_tag(format_tag)
         Proc.new { format_tag % "#{ActiveRecord::Base.current_role}" }
       end
     end

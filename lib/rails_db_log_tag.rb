@@ -10,6 +10,7 @@ module RailsDbLogTag
   class << self
     attr_accessor :enable
     attr_accessor :configuration
+    # TODO: disable/enable dynamic tag
 
     def configuration
       @configuration ||= RailsDbLogTag::Configuration.new
@@ -19,15 +20,6 @@ module RailsDbLogTag
       configuration.reset
       yield(configuration)
     end
-
-    # TODO: scope config
-    # def dynamic_configuration
-    #   @dynamic_configuration ||= RailsDbLogTag::Configuration.new
-    # end
-
-    # def dynamic_config
-    #   yield(dynamic_configuration)
-    # end
   end
 
   included do

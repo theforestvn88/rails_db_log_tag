@@ -17,10 +17,13 @@ class LogTagTest < ActiveSupport::TestCase
 
   def test_disable_gem
     RailsDbLogTag.enable = false
+    RailsDbLogTag.config do |config|
+      config.fixed_prefix_tag "DEMO"
+    end
 
     Person.first
     wait
-    assert_no_match(/role: writing/, @logger.logged(:debug).last)
+    assert_no_match(/DEMO/, @logger.logged(:debug).last)
   end
   
   def test_not_setup_gem_yet
@@ -30,13 +33,24 @@ class LogTagTest < ActiveSupport::TestCase
 
     Person.first
     wait
-    assert_no_match(/role: writing/, @logger.logged(:debug).last)
+    assert_no_match(/DEMO/, @logger.logged(:debug).last)
+  end
+
+  def test_fixed_prefix_tag
+    RailsDbLogTag.enable = true
+    RailsDbLogTag.config do |config|
+      config.fixed_prefix_tag "DEMO"
+    end
+
+    Person.first
+    wait
+    assert_match(/DEMO/, @logger.logged(:debug).last)
   end
 
   def test_db_current_role_tag
     RailsDbLogTag.enable = true
     RailsDbLogTag.config do |config|
-      config.prepend_db_current_role
+      config.prepend_db_role
     end
 
     Person.first
@@ -45,10 +59,22 @@ class LogTagTest < ActiveSupport::TestCase
     assert_no_match(/db writing/, @logger.logged(:debug).last)
   end
 
+  def test_config_multi_tags
+    RailsDbLogTag.enable = true
+    RailsDbLogTag.config do |config|
+      config.fixed_prefix_tag "DEMO"
+      config.prepend_db_role
+    end
+
+    Person.first
+    wait
+    assert_match(/DEMO \[role: writing\]/, @logger.logged(:debug).last)
+  end
+
   def test_ignore_explain_sql
     RailsDbLogTag.enable = true
     RailsDbLogTag.config do |config|
-      config.prepend_db_current_role
+      config.prepend_db_role
     end
 
     Person.all.explain
@@ -59,7 +85,7 @@ class LogTagTest < ActiveSupport::TestCase
   def test_format_db_current_role_tag
     RailsDbLogTag.enable = true
     RailsDbLogTag.config do |config|
-      config.prepend_db_current_role "db %s"
+      config.prepend_db_role "db %s"
     end
 
     Person.first
@@ -86,7 +112,7 @@ class LogTagTest < ActiveSupport::TestCase
     assert_no_match(/\/\* log_tag:Usecase-6 \*\//, @logger.logged(:debug).last)
   end
 
-  def test_dynamic_query_tag3
+  def test_donot_remove_normal_annotations
     Person.annotate("annotation").where(name: 'bob').first
     wait
     assert_match(/\/\* annotation \*\//, @logger.logged(:debug).last)
