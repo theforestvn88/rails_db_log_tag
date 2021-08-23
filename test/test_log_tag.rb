@@ -103,6 +103,28 @@ class LogTagTest < ActiveSupport::TestCase
     end
   end
 
+  # COLORIZE
+
+  def test_colorize_tag
+    ActiveSupport::LogSubscriber.colorize_logging = true
+    RailsDbLogTag.enable = true
+    RailsDbLogTag.config do |config|
+      config.fixed_prefix_tag "RED", color: :red
+    end
+
+    Person.first
+    wait
+    assert_match(/\e\[31mRED/, @logger.logged(:debug).last)
+  end
+
+  def test_not_allow_config_unknow_color
+    assert_raise NameError do
+      RailsDbLogTag.config do |config|
+        config.fixed_prefix_tag "PURPIL", color: :purpil
+      end
+    end
+  end
+
   # DYNAMIC TEST CASES
   
   def test_dynamic_query_tag1

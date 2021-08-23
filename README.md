@@ -85,11 +85,33 @@
   # |-> DB writing ->  Product Load (0.3ms)  SELECT "products".* FROM "products" ...
   ```
 
+  + color
+
+    ```ruby
+    RailsDbLogTag.config do |config|
+      config.fixed_prefix_tag "VERSION_100", color: :red
+    end
+    ```
+
+    Suppport colors:
+
+    ```ruby
+    # active_support/log_subscriber.rb
+    BLACK   = "\e[30m"
+    RED     = "\e[31m"
+    GREEN   = "\e[32m"
+    YELLOW  = "\e[33m"
+    BLUE    = "\e[34m"
+    MAGENTA = "\e[35m"
+    CYAN    = "\e[36m"
+    WHITE   = "\e[37m"
+    ```
+
+    Note that color format will follow the logic checking `colorize_logging == true` of the class `ActiveSupport::LogSubscriber`, so tags will be colorized iff you set `ActiveSupport::LogSubscriber.colorize_logging = true`
+
 ## TODO: 
 
   + format tags
-
-    . color
 
     .
 
@@ -124,5 +146,7 @@
     . info log on production (QueryInfoLogger?)
 
     .
+
+  + support custom logger
 
   + benchmark

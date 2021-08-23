@@ -1,7 +1,7 @@
 
 Gem::Specification.new do |s|
   s.name        = 'rails_db_log_tag'
-  s.version     = '0.0.1'
+  s.version     = '0.0.2'
   s.summary     = "rails db log tag"
   s.description = "rails db log tag"
   s.authors     = ["Lam Phan"]

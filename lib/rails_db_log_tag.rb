@@ -45,12 +45,12 @@ module RailsDbLogTag
           tags = event.payload[:sql].scan(ActiveRecord::Relation::Tags_Regex).map(&:first).join(" ")
           event.payload[:name] = "#{tags} #{event.payload[:name]}"
         end
-
+        
         event.payload[:sql] = event.payload[:sql].gsub(ActiveRecord::Relation::Tags_Regex, "")
       end
-
+      
       def concat_log_tags(event)
-        prefix_tags = RailsDbLogTag.configuration.log_tags.map(&:call).join(" ")
+        prefix_tags = RailsDbLogTag.configuration.log_tags_with_color(colorizer: self).join(" ")
         unless schema_or_explain?(event) || prefix_tags.empty?
           event.payload[:name] = "#{prefix_tags} #{event.payload[:name]}"
         end
