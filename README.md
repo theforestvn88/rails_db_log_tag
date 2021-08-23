@@ -2,7 +2,7 @@
 
   > Allow to prepend prefix `tags` before db query logs. 
 
-  For example: below show the prefix tag `[role: reading]` which is the role of database
+  For example: below show the prefix tag `[role: reading]` which is the role of the current database
 
   ```ruby
   Product.all
@@ -17,7 +17,7 @@
   ```ruby
   # config/intiializers/db_log_tags.rb
   RailsDbLogTag.config do |config|
-    config.fixed_prefix_tag "DEMO"
+    config.fixed_prefix_tag "[VERSION_1.0.0]"
   end
 
   RailsDbLogTag.enable = true
@@ -27,7 +27,7 @@
 
   ```ruby
   Product.first
-  # DEMO Product Load (0.3ms)  SELECT "products".* FROM "products" ...
+  # [VERSION_1.0.0] Product Load (0.3ms)  SELECT "products".* FROM "products" ...
   ```
 
 - Dynamic Tags
@@ -54,15 +54,15 @@
   ```ruby
   # config/intiializers/db_log_tags.rb
   RailsDbLogTag.config do |config|
-    config.fixed_prefix_tag "DEMO"
-    config.prepend_db_role
+    config.fixed_prefix_tag "[VERSION_1.0.0]"
+    config.prepend_db_role_tag
   end
   RailsDbLogTag.enable = true
   ```
 
   ```ruby
-  Product.log_tag("DYNAMIC").first
-  # DYNAMIC DEMO [role: reading] Product Load (0.3ms)  SELECT "products".* FROM "products" ...
+  Product.log_tag("[USECASE-15]").first
+  # [USECASE-15] [VERSION_1.0.0] [role: reading] Product Load (0.3ms)  SELECT "products".* FROM "products" ...
   ```
 
 - Format Tags
@@ -72,7 +72,7 @@
   RailsDbLogTag.config do |config|
     # db role tag
     # default format: [role: %s]
-    config.prepend_db_role "|-> DB %s ->"
+    config.prepend_db_role_tag "|-> DB %s ->"
   end
 
   RailsDbLogTag.enable = true
@@ -104,6 +104,8 @@
   + scope tags
 
     . base on calller: model / serivce / job ... (base on tracing caller, need a proxy logger?)
+
+    . versions: app / dependent gems 
 
     .
 

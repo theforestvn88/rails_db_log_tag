@@ -11,6 +11,8 @@ module RailsDbLogTag
     attr_accessor :enable
     attr_accessor :configuration
     # TODO: disable/enable dynamic tag
+    # TODO: ignored payload name, right now is [SCHEMA, EXPLAIN]
+    # TODO: cache queries ?
 
     def configuration
       @configuration ||= RailsDbLogTag::Configuration.new
@@ -26,9 +28,6 @@ module RailsDbLogTag
     alias_method :origin_sql, :sql
     def sql(event)
       if RailsDbLogTag.enable
-        # TODO: 
-        # + cache
-        #
         begin
           concat_log_tags(event)
           parse_annotations_as_dynamic_tags(event)

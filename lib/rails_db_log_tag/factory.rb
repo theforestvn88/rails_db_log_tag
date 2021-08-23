@@ -2,13 +2,29 @@
 
 module RailsDbLogTag
   class Factory
-    class << self
-      def fixed_prefix_tag(tag)
-        Proc.new { "#{tag}" }
-      end
+    TAGS = {
+      # one usecase come to my head is the VERSION
+      # ex: "[v.1.0.1] Product Load (0.3ms)  SELECT "products".* FROM "products" ..."
+      :fixed_prefix => "%s",
+      # show current database role, ex: writting, reading, ...
+      :db_role => Proc.new { |format_tag|
+        format_tag ||= "[role: %s]" 
+        -> { format_tag % "#{ActiveRecord::Base.current_role}" }
+      }
+    }.freeze
 
-      def db_role_tag(format_tag)
-        Proc.new { format_tag % "#{ActiveRecord::Base.current_role}" }
+    def self.create_tag(tag, *args)
+      tag_formula = TAGS[tag]
+      raise ArgumentError, "could not create tag #{tag}" if tag_formula.nil?
+
+      case tag_formula
+      when Proc
+        tag_formula.call(*args) 
+      when String
+        format_string = tag_formula % args
+        -> { format_string }
+      else
+        raise ArgumentError, "could not create tag #{tag}"
       end
     end
   end

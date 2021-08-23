@@ -14,12 +14,12 @@ module RailsDbLogTag
       @log_tags = []
     end
 
-    def fixed_prefix_tag(tag)
-      @log_tags << Factory.fixed_prefix_tag(tag)
-    end
-
-    def prepend_db_role(format_tag="[role: %s]")
-      @log_tags << Factory.db_role_tag(format_tag)
+    Factory::TAGS.keys.each do |tag_key|
+      tag_method_name = "#{tag_key}_tag" 
+      define_method(tag_method_name) do |*args|
+        @log_tags << Factory.create_tag(tag_key, *args)
+      end
+      alias_method "prepend_#{tag_method_name}", tag_method_name
     end
   end
 end

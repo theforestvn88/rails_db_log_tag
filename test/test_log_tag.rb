@@ -50,7 +50,7 @@ class LogTagTest < ActiveSupport::TestCase
   def test_db_current_role_tag
     RailsDbLogTag.enable = true
     RailsDbLogTag.config do |config|
-      config.prepend_db_role
+      config.prepend_db_role_tag
     end
 
     Person.first
@@ -63,7 +63,7 @@ class LogTagTest < ActiveSupport::TestCase
     RailsDbLogTag.enable = true
     RailsDbLogTag.config do |config|
       config.fixed_prefix_tag "DEMO"
-      config.prepend_db_role
+      config.prepend_db_role_tag
     end
 
     Person.first
@@ -74,7 +74,7 @@ class LogTagTest < ActiveSupport::TestCase
   def test_ignore_explain_sql
     RailsDbLogTag.enable = true
     RailsDbLogTag.config do |config|
-      config.prepend_db_role
+      config.prepend_db_role_tag
     end
 
     Person.all.explain
@@ -85,13 +85,22 @@ class LogTagTest < ActiveSupport::TestCase
   def test_format_db_current_role_tag
     RailsDbLogTag.enable = true
     RailsDbLogTag.config do |config|
-      config.prepend_db_role "db %s"
+      config.prepend_db_role_tag "db %s"
     end
 
     Person.first
     wait
     assert_no_match(/role: writing/, @logger.logged(:debug).last)
     assert_match(/db writing/, @logger.logged(:debug).last)
+  end
+
+  def test_could_not_create_tag
+    assert_raise NoMethodError do
+      RailsDbLogTag.enable = true
+      RailsDbLogTag.config do |config|
+        config.not_existed 
+      end
+    end
   end
 
   # DYNAMIC TEST CASES
