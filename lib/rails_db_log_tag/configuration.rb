@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
 require_relative "factory"
+require_relative "colors"
 
 module RailsDbLogTag
   class Configuration
+    include Colors
+
     attr_reader  :log_tags
     attr_reader  :tag_colors
 
@@ -20,11 +23,11 @@ module RailsDbLogTag
       ActiveSupport::LogSubscriber.colorize_logging
     end
 
-    def log_tags_with_color(colorizer:)
+    def log_tags_with_color
       @log_tags.map { |tag_key, tag_proc|
         tag = tag_proc.call
         if colorize? && tag_color = @tag_colors[tag_key]
-          colorizer.send(:color, tag, tag_color, true)
+          set_color(tag, tag_color)
         else
           tag
         end
@@ -35,7 +38,7 @@ module RailsDbLogTag
       tag_method_name = "#{tag_key}_tag" 
       define_method(tag_method_name) do |*args, **options|
         if color = options&.dig(:color)
-          @tag_colors[tag_key] = "ActiveRecord::LogSubscriber::#{color.to_s.upcase}".constantize
+          @tag_colors[tag_key] = get_color_const(color)
         end
 
         @log_tags[tag_key] = Factory.create_tag(tag_key, *args)

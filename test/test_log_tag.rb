@@ -155,4 +155,11 @@ class LogTagTest < ActiveSupport::TestCase
     wait
     assert_no_match(/Usecase-6/, @logger.logged(:debug).last)
   end
+
+  def test_colorize_dynamic_tag
+    Person.log_tag("RED", color: :red).where(name: 'bob').first
+    wait
+    assert_match(/\e\[1m\e\[31mRED\e\[0m/, @logger.logged(:debug).last)
+    assert_no_match(/\/\* log_tag:\e\[1m\e\[31mRED\e\[0m \*\//, @logger.logged(:debug).last)
+  end
 end

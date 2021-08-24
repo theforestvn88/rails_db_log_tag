@@ -109,6 +109,15 @@
 
     Note that color format will follow the logic checking `colorize_logging == true` of the class `ActiveSupport::LogSubscriber`, so tags will be colorized iff you set `ActiveSupport::LogSubscriber.colorize_logging = true`
 
+  + dynamic colorize tags
+
+    ```ruby
+    Product.log_tag("BESTSELLER", color: :yellow).where...
+    # BESTSELLER Product Load (0.6ms)  SELECT "products". ...
+    ```
+
+    Note: `ActiveSupport::LogSubscriber.colorize_logging` does not effect dynamic colorize tags
+
 ## TODO: 
 
   + format tags

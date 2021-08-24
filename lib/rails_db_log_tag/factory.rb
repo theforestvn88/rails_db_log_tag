@@ -15,7 +15,8 @@ module RailsDbLogTag
 
     def self.create_tag(tag, *args)
       tag_formula = TAGS[tag]
-      raise ArgumentError, "could not create tag #{tag}" if tag_formula.nil?
+      error_create_tag = "could not create tag #{tag}"
+      raise ArgumentError, error_create_tag if tag_formula.nil?
 
       case tag_formula
       when Proc
@@ -24,7 +25,7 @@ module RailsDbLogTag
         format_string = tag_formula % args
         -> { format_string }
       else
-        raise ArgumentError, "could not create tag #{tag}"
+        raise ArgumentError, error_create_tag
       end
     end
   end
