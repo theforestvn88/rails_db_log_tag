@@ -19,6 +19,8 @@ module ActiveRecord
     Tags_Regex = /\/\* log_tag:(.*) \*\//
 
     def log_tag(tag_name, options={})
+      return self unless RailsDbLogTag.enable
+
       tag_color = options.dig(:color)
       tag_name = RailsDbLogTag::Colors.set_color(tag_name, tag_color) unless tag_color.nil?
       self.annotate_values = ["log_tag:#{tag_name}"]

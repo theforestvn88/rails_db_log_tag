@@ -13,21 +13,10 @@ class LogTagTest < ActiveSupport::TestCase
 
   setup do
     ActiveRecord::LogSubscriber.attach_to(:active_record)
-  end
-
-  def test_disable_gem
-    RailsDbLogTag.enable = false
-    RailsDbLogTag.config do |config|
-      config.fixed_prefix_tag "DEMO"
-    end
-
-    Person.first
-    wait
-    assert_no_match(/DEMO/, @logger.logged(:debug).last)
+    RailsDbLogTag.enable = true
   end
   
   def test_not_setup_gem_yet
-    RailsDbLogTag.enable = true
     RailsDbLogTag.config do |config|
     end
 
@@ -37,7 +26,6 @@ class LogTagTest < ActiveSupport::TestCase
   end
 
   def test_fixed_prefix_tag
-    RailsDbLogTag.enable = true
     RailsDbLogTag.config do |config|
       config.fixed_prefix_tag "DEMO"
     end
@@ -48,7 +36,6 @@ class LogTagTest < ActiveSupport::TestCase
   end
 
   def test_db_current_role_tag
-    RailsDbLogTag.enable = true
     RailsDbLogTag.config do |config|
       config.prepend_db_role_tag
     end
@@ -60,7 +47,6 @@ class LogTagTest < ActiveSupport::TestCase
   end
 
   def test_config_multi_tags
-    RailsDbLogTag.enable = true
     RailsDbLogTag.config do |config|
       config.fixed_prefix_tag "DEMO"
       config.prepend_db_role_tag
@@ -72,7 +58,6 @@ class LogTagTest < ActiveSupport::TestCase
   end
 
   def test_ignore_explain_sql
-    RailsDbLogTag.enable = true
     RailsDbLogTag.config do |config|
       config.prepend_db_role_tag
     end
@@ -83,7 +68,6 @@ class LogTagTest < ActiveSupport::TestCase
   end
 
   def test_format_db_current_role_tag
-    RailsDbLogTag.enable = true
     RailsDbLogTag.config do |config|
       config.prepend_db_role_tag "db %s"
     end
@@ -96,7 +80,6 @@ class LogTagTest < ActiveSupport::TestCase
 
   def test_could_not_create_tag
     assert_raise NoMethodError do
-      RailsDbLogTag.enable = true
       RailsDbLogTag.config do |config|
         config.not_existed 
       end
@@ -107,7 +90,6 @@ class LogTagTest < ActiveSupport::TestCase
 
   def test_colorize_tag
     ActiveSupport::LogSubscriber.colorize_logging = true
-    RailsDbLogTag.enable = true
     RailsDbLogTag.config do |config|
       config.fixed_prefix_tag "RED", color: :red
     end
@@ -128,8 +110,6 @@ class LogTagTest < ActiveSupport::TestCase
   # DYNAMIC TEST CASES
   
   def test_dynamic_query_tag1
-    RailsDbLogTag.enable = true
-
     Person.log_tag("Usecase-6").count
     wait
     assert_match(/Usecase-6/, @logger.logged(:debug).last)
@@ -150,7 +130,6 @@ class LogTagTest < ActiveSupport::TestCase
   end
 
   def test_not_using_dynamic_query_tag
-    RailsDbLogTag.enable = true
     Person.count
     wait
     assert_no_match(/Usecase-6/, @logger.logged(:debug).last)
