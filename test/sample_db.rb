@@ -2,11 +2,6 @@
 
 require "active_record"
 
-class Person < ActiveRecord::Base
-  establish_connection adapter: "sqlite3", database: "myfirstgem.db"
-  connection.create_table table_name, force: true do |t|
-    t.string :name
-  end
-end
+require_relative "./dummy/person"
 
 bob = Person.create!(name: "bob")

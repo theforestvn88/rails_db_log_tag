@@ -2,9 +2,11 @@
 
 require_relative "rails_db_log_tag/configuration"
 require_relative "rails_db_log_tag/dynamic_query_tag"
+require_relative "rails_db_log_tag/scope"
 
 module RailsDbLogTag
   extend ActiveSupport::Concern
+  include Scope
   
   # global setting
   class << self
@@ -30,6 +32,7 @@ module RailsDbLogTag
       if RailsDbLogTag.enable
         begin
           concat_log_tags(event)
+          scope_log_tags(event)
           parse_annotations_as_dynamic_tags(event)
         rescue => e
         end
@@ -47,6 +50,16 @@ module RailsDbLogTag
         end
         
         event.payload[:sql] = event.payload[:sql].gsub(ActiveRecord::Relation::Tags_Regex, "")
+      end
+
+      def scope_log_tags(event)
+        return if schema_or_explain?(event)
+
+        scope_tags = RailsDbLogTag.configuration.scope_tags
+        found_scope_tags = find_scope_tags_from_caller(scope_tags, caller)
+        unless found_scope_tags.blank?
+          event.payload[:name] = "#{found_scope_tags} #{event.payload[:name]}"
+        end
       end
       
       def concat_log_tags(event)

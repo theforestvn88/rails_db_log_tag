@@ -8,6 +8,8 @@
   Product.all
   # [role: reading] Product Load (0.4ms)  SELECT "products".* FROM "products" ...
   ```
+  **NOTE**: support only ActiveRecord (so far).
+
 ## Using
 
 - Install
@@ -42,7 +44,7 @@
   ```
 
   ```ruby
-  Product.log_tag("DYNAMIC").first
+  Product.log_tag("DYNAMIC").where(name: "DYNAMIC")
   # DYNAMIC Product Load (0.3ms)  SELECT "products".* FROM "products" ...
 
   Product.where("price < ?", 100).log_tag("<CHEAP BOOK>").first(10)
@@ -118,6 +120,39 @@
 
     Note: `ActiveSupport::LogSubscriber.colorize_logging` does not effect dynamic colorize tags
 
+- Scope Tags
+
+  You maybe want to know where a query come from, for example: a query `Product.all` could be called on controller or service or job ... But your log don't tell you much, in case you turn on `verbose_query_logs` the verbose logs only show the first line of the `caller` and no more. 
+
+  With this gem, you could setup scope logs map tags (with a good names) to regexps, then them will be used to filter `caller` lines, if there's any line matched, the tag will be prepend to the showed tags on log.
+
+  ```ruby
+  # config/intiializers/db_log_tags.rb
+  RailsDbLogTag.config do |config|
+    config.scope_tag "SERVICE", regexp: /service/
+  end
+  RailsDbLogTag.enable = true
+
+  # services/product_service.rb
+  class ProductService
+    def all_products
+      Product.all
+    end
+  end
+
+  # controllers/products_controller
+    # GET /products or /products.json
+    def index
+      @products = ProductService.new.all_products
+    end
+  ```
+
+  now when you call API `GET /products`, the log will show
+
+  ```ruby
+  # FIXME:
+  ``` 
+
 ## TODO: 
 
   + format tags
@@ -134,19 +169,19 @@
 
   + scope tags
 
-    . base on calller: model / serivce / job ... (base on tracing caller, need a proxy logger?)
+    . classes: model / serivce / job ...
 
-    . versions: app / dependent gems 
+      . base on tracing caller + name convenient
 
-    .
+      . using refinement
+
+    . 
 
   + info tags
 
-    . slow queries 
+    . slow queries, time consume range 
 
     . counter
-
-    . time consume range, ex: green: 1ms -> 10ms, yellow: > 10ms, red: > 100ms
 
     .
 
@@ -159,3 +194,5 @@
   + support custom logger
 
   + benchmark
+
+  + support other ORM ?
