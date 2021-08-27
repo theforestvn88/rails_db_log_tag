@@ -3,10 +3,12 @@
 require_relative "rails_db_log_tag/configuration"
 require_relative "rails_db_log_tag/dynamic_query_tag"
 require_relative "rails_db_log_tag/scope"
+require_relative "rails_db_log_tag/trace"
 
 module RailsDbLogTag
   extend ActiveSupport::Concern
   include Scope
+  include Trace
   
   # global setting
   class << self
@@ -33,6 +35,7 @@ module RailsDbLogTag
         begin
           concat_log_tags(event)
           scope_log_tags(event)
+          trace_log_tags(event)
           parse_annotations_as_dynamic_tags(event)
         rescue => e
         end
@@ -53,12 +56,16 @@ module RailsDbLogTag
       end
 
       def scope_log_tags(event)
+        # TODO:
+      end
+
+      def trace_log_tags(event)
         return if schema_or_explain?(event)
 
-        scope_tags = RailsDbLogTag.configuration.scope_tags
-        found_scope_tags = find_scope_tags_from_caller(scope_tags, caller)
-        unless found_scope_tags.blank?
-          event.payload[:name] = "#{found_scope_tags} #{event.payload[:name]}"
+        trace_tags = RailsDbLogTag.configuration.trace_tags
+        found_trace_tags = tracing_tags_from_caller(trace_tags, caller)
+        unless found_trace_tags.blank?
+          event.payload[:name] = "#{found_trace_tags} #{event.payload[:name]}"
         end
       end
       
@@ -78,3 +85,6 @@ end
 ActiveSupport.on_load(:active_record) do
   ActiveRecord::LogSubscriber.send(:include, RailsDbLogTag)
 end
+
+# TODO:
+# QUESTION: override LogSubscriber or create custom ?

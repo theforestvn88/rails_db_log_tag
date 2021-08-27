@@ -10,6 +10,7 @@ module RailsDbLogTag
     attr_reader  :log_tags
     attr_reader  :tag_colors
     attr_reader  :scope_tags
+    attr_reader  :trace_tags
 
     def initialize
       reset
@@ -19,6 +20,7 @@ module RailsDbLogTag
       @log_tags = {}
       @tag_colors = {}
       @scope_tags = {}
+      @trace_tags = {}
     end
 
     def colorize?
@@ -48,11 +50,11 @@ module RailsDbLogTag
       alias_method "prepend_#{tag_method_name}", tag_method_name
     end
 
-    def scope_tag(scope_name, **options)
-      raise ArgumentError "require atleast one option" if options.nil?
-
+    def trace_tag(tag_name, **options)
       regexp = options&.dig(:regexp)
-      @scope_tags[scope_name] = regexp
+      raise ArgumentError "require regexp" if regexp.nil?
+
+      @trace_tags[tag_name] = regexp
     end
   end
 end

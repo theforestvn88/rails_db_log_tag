@@ -120,16 +120,16 @@
 
     Note: `ActiveSupport::LogSubscriber.colorize_logging` does not effect dynamic colorize tags
 
-- Scope Tags
+- Tracing Tags
 
   You maybe want to know where a query come from, for example: a query `Product.all` could be called on controller or service or job ... But your log don't tell you much, in case you turn on `verbose_query_logs` the verbose logs only show the first line of the `caller` and no more. 
 
-  With this gem, you could setup scope logs map tags (with a good names) to regexps, then them will be used to filter `caller` lines, if there's any line matched, the tag will be prepend to the showed tags on log.
+  With this gem, you could setup trace logs map tags (with a good names) to regexps, then them will be used to filter `caller` lines, if there's any line matched, the tag will be prepend to the showed tags on log.
 
   ```ruby
   # config/intiializers/db_log_tags.rb
   RailsDbLogTag.config do |config|
-    config.scope_tag "SERVICE", regexp: /service/
+    config.trace_tag "SERVICE", regexp: /service/
   end
   RailsDbLogTag.enable = true
 
@@ -167,13 +167,18 @@
 
     . 
 
+  + trace tags
+
+    . base on tracing caller + name convenient
+
+    .
+
   + scope tags
 
     . classes: model / serivce / job ...
 
-      . base on tracing caller + name convenient
-
-      . using refinement
+    
+    . using refinement ?
 
     . 
 
@@ -192,6 +197,8 @@
     .
 
   + support custom logger
+
+  + support action controller / active view / action mailer / active job
 
   + benchmark
 
