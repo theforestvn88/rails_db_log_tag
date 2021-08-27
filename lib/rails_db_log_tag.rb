@@ -7,7 +7,6 @@ require_relative "rails_db_log_tag/trace"
 
 module RailsDbLogTag
   extend ActiveSupport::Concern
-  include Scope
   include Trace
   
   # global setting
@@ -34,7 +33,6 @@ module RailsDbLogTag
       if RailsDbLogTag.enable
         begin
           concat_log_tags(event)
-          scope_log_tags(event)
           trace_log_tags(event)
           parse_annotations_as_dynamic_tags(event)
         rescue => e
@@ -56,10 +54,6 @@ module RailsDbLogTag
         event.payload[:sql] = event.payload[:sql].gsub(ActiveRecord::Relation::Tags_Regex, "")
         # still keep normal annotations
         event.payload[:sql] = event.payload[:sql].gsub(ActiveRecord::Relation::Empty_Annotation, "")
-      end
-
-      def scope_log_tags(event)
-        # TODO:
       end
 
       def trace_log_tags(event)

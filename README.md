@@ -153,6 +153,21 @@
   # FIXME:
   ``` 
 
+- Scoping Tags
+
+  In some cases, you want to add a scope log tag, for example: for analysis purpose, you want to set tag only for all User queries happen on jobs (i.e SendEmailJob).
+
+  ```ruby
+  class SendEmailJob < ActiveJob::Base
+    # using refinement
+    using RailsDbLogTag::Scope.create "[User-in-Job]" => [User]
+
+    def perform(user_id)
+      User.find(user_id)
+    end
+  end
+  ```
+
 ## TODO: 
 
   + format tags

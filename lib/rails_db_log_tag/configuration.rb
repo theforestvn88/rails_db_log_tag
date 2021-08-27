@@ -9,7 +9,6 @@ module RailsDbLogTag
 
     attr_reader  :log_tags
     attr_reader  :tag_colors
-    attr_reader  :scope_tags
     attr_reader  :trace_tags
 
     def initialize
@@ -19,7 +18,6 @@ module RailsDbLogTag
     def reset
       @log_tags = {}
       @tag_colors = {}
-      @scope_tags = {}
       @trace_tags = {}
     end
 
