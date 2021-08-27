@@ -16,14 +16,15 @@ module ActiveRecord
     #       end
     #
 
-    Tags_Regex = /\/\* log_tag:(.*) \*\//
+    Tags_Regex = /:tag:(.+):tag:/
+    Empty_Annotation = /\/\*\s*\*\//
 
     def log_tag(tag_name, options={})
       return self unless RailsDbLogTag.enable
 
       tag_color = options.dig(:color)
       tag_name = RailsDbLogTag::Colors.set_color(tag_name, tag_color) unless tag_color.nil?
-      self.annotate_values = ["log_tag:#{tag_name}"]
+      self.annotate_values += [":tag:#{tag_name}:tag:"]
       self
     end
   end

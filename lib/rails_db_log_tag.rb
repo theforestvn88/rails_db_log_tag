@@ -47,12 +47,15 @@ module RailsDbLogTag
     private
 
       def parse_annotations_as_dynamic_tags(event)
-        unless schema_or_explain?(event)
-          tags = event.payload[:sql].scan(ActiveRecord::Relation::Tags_Regex).map(&:first).join(" ")
-          event.payload[:name] = "#{tags} #{event.payload[:name]}" unless tags.nil?
+        tags = event.payload[:sql].scan(ActiveRecord::Relation::Tags_Regex).map(&:first).join(" ")
+
+        unless schema_or_explain?(event) || tags.nil?
+          event.payload[:name] = "#{tags} #{event.payload[:name]}" 
         end
         
         event.payload[:sql] = event.payload[:sql].gsub(ActiveRecord::Relation::Tags_Regex, "")
+        # still keep normal annotations
+        event.payload[:sql] = event.payload[:sql].gsub(ActiveRecord::Relation::Empty_Annotation, "")
       end
 
       def scope_log_tags(event)
