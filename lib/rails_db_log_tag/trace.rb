@@ -14,3 +14,12 @@ module RailsDbLogTag
   end
 end
 
+# module ActiveRecord::Scoping::Named::ClassMethods
+#   alias_method :origin_all, :all
+#   def all
+#     # puts caller.lazy.filter { |line| /dummy/.match?(line) }.first
+#     scope = origin_all
+#     # RailsDbLogTag::Scope.append_scope_tag(scope)
+#     scope
+#   end
+# end

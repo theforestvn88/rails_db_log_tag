@@ -12,15 +12,16 @@ module RailsDbLogTag
     # now all Person queries log, such as Person.first, 
     # will be automatically prepend scope tag "PersonJob"
     #
-    def self.create(scopes)
+    def self.create_refinement(scopes)
       # init an anonymous module
       # that will be `using`
       Module.new do
         scopes.each do |scope_tag, clazzs|
           clazzs.each do |kclazz|
             # it's better to use refinement here
-            # ex: Person queries could be set scope tag in a job/worker
-            #  but no need set scope tag for Person queries in services/controllers
+            # so set up scope tags for Person queries in a job/worker
+            # will not effect Person class and 
+            # any Person queries in other places: services/controllers ...
             #
             refine kclazz.singleton_class do
               # decorating all querying methods

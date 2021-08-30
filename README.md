@@ -155,18 +155,49 @@
 
 - Scoping Tags
 
-  In some cases, you want to add a scope log tag, for example: for analysis purpose, you want to set tag only for all User queries happen on jobs (i.e SendEmailJob).
+  In some cases (such as for analysis purpose), you want to add a scope log tag for just only apart of your project, for example: you want to set tag only for all User queries happen on jobs (i.e SendEmailJob) and it should not effect other any User quieries in any other places.
 
   ```ruby
   class SendEmailJob < ActiveJob::Base
     # using refinement
-    using RailsDbLogTag::Scope.create "[User-in-Job]" => [User]
+    # set scope tag for only User queries
+    using RailsDbLogTag::Scope.create_refinement "[User-in-Job]" => [User]
 
     def perform(user_id)
-      User.find(user_id)
+      User.find(user_id) # User-in-Job  SELECT "users".* FROM ...
+      Role.where ...     # SELECT "roles".* FROM ...
     end
   end
   ```
+  You could create scope tags for a parent class's methods and it'll effect on all children classes
+
+  ```ruby
+  # user_job.rb
+  class UserJob < ActiveJob::Base
+    def query_before_using_refinement
+      # this User query should NOT be prepended "UserJob"
+      Person.where(id: 1).first
+    end
+
+    using RailsDbLogTag::Scope.create_refinement "UserJob" => [Person]
+
+    def query_after_using_refinement
+      # this User query should be prepended "UserJob"
+      Person.where(id: 1).first
+    end
+  end
+
+  # developer_job.rb
+  class DeveloperJob < UserJob
+  end
+
+  # the log should NOT contains "UserJob"
+  DeveloperJob.new.query_before_using_refinement
+
+  # the log should contains "UserJob"
+  DeveloperJob.new.query_after_using_refinement
+  ```
+
 
 ## TODO: 
 
@@ -189,11 +220,6 @@
     .
 
   + scope tags
-
-    . classes: model / serivce / job ...
-
-    
-    . using refinement ?
 
     . 
 

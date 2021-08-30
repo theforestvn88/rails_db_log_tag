@@ -1,8 +1,8 @@
 require_relative "./person"
 require "rails_db_log_tag/scope"
 
-class PersonJob
-  using RailsDbLogTag::Scope.create "PersonJob" => [Person]
+class SendEmailJob
+  using RailsDbLogTag::Scope.create_refinement "SendEmailJob" => [Person]
 
   def perform
     Person.where(id: 1).first
