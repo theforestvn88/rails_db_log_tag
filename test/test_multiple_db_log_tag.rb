@@ -1,10 +1,9 @@
 require "test_helper"
 require "active_support/log_subscriber/test_helper"
 require "rails_db_log_tag"
-require_relative "./dummy/sample_db"
-require_relative "./dummy/person_service"
+require_relative "./dummy/multiple_db"
 
-class TraceLogTagsTest < ActiveSupport::TestCase
+class MultipleDbLogTagTest < ActiveSupport::TestCase
   include ActiveSupport::LogSubscriber::TestHelper
   include ActiveSupport::Testing::MethodCallAssertions
 
@@ -14,16 +13,19 @@ class TraceLogTagsTest < ActiveSupport::TestCase
 
   setup do
     ActiveRecord::LogSubscriber.attach_to(:active_record)
-  end
-  
-  def test_trace_tag
-    RailsDbLogTag.config do |config|
-      config.trace_tag "PERSON SERVICE", regexp: /person_service/
-    end
     RailsDbLogTag.enable = true
+  end
 
-    PersonService.new.top
+  def test_db_name_tag
+    RailsDbLogTag.config do |config|
+      config.prepend_db_name_tag Developer
+    end
+
+    ActiveRecord::Base.connected_to(role: :writing, shard: :default) do
+      Developer.where(name: "dev01")
+    end
+    
     wait
-    assert_match(/SERVICE/, @logger.logged(:debug).last)
+    assert_match(/db_name: primary/, @logger.logged(:debug).last)
   end
 end

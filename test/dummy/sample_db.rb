@@ -2,6 +2,6 @@
 
 require "active_record"
 
-require_relative "./dummy/person"
+require_relative "./person"
 
 bob = Person.create!(name: "bob")

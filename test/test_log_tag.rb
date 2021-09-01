@@ -1,7 +1,7 @@
 require "test_helper"
 require "active_support/log_subscriber/test_helper"
 require "rails_db_log_tag"
-require_relative "sample_db"
+require_relative "./dummy/sample_db"
 
 class LogTagTest < ActiveSupport::TestCase
   include ActiveSupport::LogSubscriber::TestHelper
@@ -42,7 +42,7 @@ class LogTagTest < ActiveSupport::TestCase
 
     Person.first
     wait
-    assert_match(/role: writing/, @logger.logged(:debug).last)
+    assert_match(/db_role: writing/, @logger.logged(:debug).last)
     assert_no_match(/db writing/, @logger.logged(:debug).last)
   end
 
@@ -54,7 +54,7 @@ class LogTagTest < ActiveSupport::TestCase
 
     Person.first
     wait
-    assert_match(/DEMO \[role: writing\]/, @logger.logged(:debug).last)
+    assert_match(/DEMO \[db_role: writing\]/, @logger.logged(:debug).last)
   end
 
   def test_ignore_explain_sql
@@ -74,7 +74,7 @@ class LogTagTest < ActiveSupport::TestCase
 
     Person.first
     wait
-    assert_no_match(/role: writing/, @logger.logged(:debug).last)
+    assert_no_match(/db_role: writing/, @logger.logged(:debug).last)
     assert_match(/db writing/, @logger.logged(:debug).last)
   end
 

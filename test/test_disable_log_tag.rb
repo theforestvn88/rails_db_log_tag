@@ -1,7 +1,7 @@
 require "test_helper"
 require "active_support/log_subscriber/test_helper"
 require "rails_db_log_tag"
-require_relative "sample_db"
+require_relative "./dummy/sample_db"
 
 class DisableLogTagTest < ActiveSupport::TestCase
   include ActiveSupport::LogSubscriber::TestHelper

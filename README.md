@@ -129,29 +129,29 @@
   ```ruby
   # config/intiializers/db_log_tags.rb
   RailsDbLogTag.config do |config|
-    config.trace_tag "SERVICE", regexp: /service/
+    config.trace_tag "PRODUCT-SERVICE", regexp: /service/
   end
   RailsDbLogTag.enable = true
 
   # services/product_service.rb
   class ProductService
-    def all_products
-      Product.all
+    def best_seller_products
+      Product.where...
     end
   end
 
   # controllers/products_controller
-    # GET /products or /products.json
+    # GET /products/bestseller or /products.json
     def index
-      @products = ProductService.new.all_products
+      @products = a_product_service.best_seller_products
     end
   ```
 
-  now when you call API `GET /products`, the log will show
+  now when you call API `GET /products/bestseller`, the log will show
 
-  ```ruby
-  # FIXME:
-  ``` 
+  `PRODUCT-SERVICE Product Load (0.3ms)  SELECT "products".* FROM "products" ...` 
+
+  Note: the backtrace will not include `product_service` in case of `Product.all` 
 
 - Scoping Tags
 
