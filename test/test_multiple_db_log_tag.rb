@@ -16,9 +16,9 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
     RailsDbLogTag.enable = true
   end
 
-  def test_db_name_tag
+  def test_default_db_tag
     RailsDbLogTag.config do |config|
-      config.prepend_db_name_tag Developer
+      config.db_tag Developer
     end
 
     ActiveRecord::Base.connected_to(role: :writing, shard: :default) do
@@ -26,6 +26,19 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
     end
     
     wait
-    assert_match(/db_name: primary/, @logger.logged(:debug).last)
+    assert_match(/db.name: primary, role: writing, shard: default./, @logger.logged(:debug).last)
+  end
+
+  def test_option_db_tag
+    RailsDbLogTag.config do |config|
+      config.db_tag Developer, "%role|%shard"
+    end
+
+    ActiveRecord::Base.connected_to(role: :writing, shard: :shard_one) do
+      Developer.where(name: "dev01")
+    end
+    
+    wait
+    assert_match(/db.writing|shard_one./, @logger.logged(:debug).last)
   end
 end

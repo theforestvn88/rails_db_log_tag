@@ -18,7 +18,11 @@ ActiveRecord::Base.configurations = config
 require_relative "developer"
 
 ActiveRecord::Base.connected_to(role: :writing, shard: :default) do
-  Developer.connection.execute("DROP TABLE `developers`")
-  Developer.connection.execute("CREATE TABLE `developers` (name VARCHAR (255))")
+  Developer.connection.execute("CREATE TABLE IF NOT EXISTS `developers` (name VARCHAR (255))")
+  Developer.create(name: "dev01")
+end
+
+ActiveRecord::Base.connected_to(role: :writing, shard: :shard_one) do
+  Developer.connection.execute("CREATE TABLE IF NOT EXISTS `developers` (name VARCHAR (255))")
   Developer.create(name: "dev01")
 end

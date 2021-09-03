@@ -57,7 +57,7 @@
   # config/intiializers/db_log_tags.rb
   RailsDbLogTag.config do |config|
     config.fixed_prefix_tag "[VERSION_1.0.0]"
-    config.prepend_db_role_tag
+    config.prepend_db_tag Product, "[role: %role]"
   end
   RailsDbLogTag.enable = true
   ```
@@ -73,8 +73,8 @@
   # config/intiializers/db_log_tags.rb
   RailsDbLogTag.config do |config|
     # db role tag
-    # default format: [role: %s]
-    config.prepend_db_role_tag "|-> DB %s ->"
+    # default format: db[name: %name, role: %s, shard: %shard]
+    config.db_tag "|-> DB %role ->"
   end
 
   RailsDbLogTag.enable = true

@@ -37,7 +37,7 @@ class LogTagTest < ActiveSupport::TestCase
 
   def test_db_current_role_tag
     RailsDbLogTag.config do |config|
-      config.prepend_db_role_tag
+      config.db_tag Person, "db_role: %role"
     end
 
     Person.first
@@ -49,33 +49,22 @@ class LogTagTest < ActiveSupport::TestCase
   def test_config_multi_tags
     RailsDbLogTag.config do |config|
       config.fixed_prefix_tag "DEMO"
-      config.prepend_db_role_tag
+      config.db_tag Person, "db_role: %role"
     end
 
     Person.first
     wait
-    assert_match(/DEMO \[db_role: writing\]/, @logger.logged(:debug).last)
+    assert_match(/db_role: writing DEMO/, @logger.logged(:debug).last)
   end
 
   def test_ignore_explain_sql
     RailsDbLogTag.config do |config|
-      config.prepend_db_role_tag
+      config.db_tag Person, "db_role: %role"
     end
 
     Person.all.explain
     wait
     assert_no_match(/EXPLAIN/, @logger.logged(:debug).last)
-  end
-
-  def test_format_db_current_role_tag
-    RailsDbLogTag.config do |config|
-      config.prepend_db_role_tag "db %s"
-    end
-
-    Person.first
-    wait
-    assert_no_match(/db_role: writing/, @logger.logged(:debug).last)
-    assert_match(/db writing/, @logger.logged(:debug).last)
   end
 
   def test_could_not_create_tag

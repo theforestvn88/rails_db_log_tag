@@ -1,6 +1,6 @@
 
 Gem::Specification.new do |s|
-  s.name        = 'querying_log_tag'
+  s.name        = 'rails_db_log_tag'
   s.version     = '0.0.2'
   s.summary     = "rails activerecord querying log tag"
   s.description = "rails activerecord querying log tag"
