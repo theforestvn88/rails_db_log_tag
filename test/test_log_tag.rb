@@ -37,7 +37,7 @@ class LogTagTest < ActiveSupport::TestCase
 
   def test_db_current_role_tag
     RailsDbLogTag.config do |config|
-      config.db_tag Person, "db_role: %role"
+      config.db_tag Person => "db_role: %role"
     end
 
     Person.first
@@ -49,7 +49,7 @@ class LogTagTest < ActiveSupport::TestCase
   def test_config_multi_tags
     RailsDbLogTag.config do |config|
       config.fixed_prefix_tag "DEMO"
-      config.db_tag Person, "db_role: %role"
+      config.db_tag Person => "db_role: %role"
     end
 
     Person.first
@@ -59,7 +59,7 @@ class LogTagTest < ActiveSupport::TestCase
 
   def test_ignore_explain_sql
     RailsDbLogTag.config do |config|
-      config.db_tag Person, "db_role: %role"
+      config.fixed_prefix_tag "DEMO"
     end
 
     Person.all.explain

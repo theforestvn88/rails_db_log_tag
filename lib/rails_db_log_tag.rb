@@ -4,6 +4,7 @@ require_relative "rails_db_log_tag/configuration"
 require_relative "rails_db_log_tag/dynamic_query_tag"
 require_relative "rails_db_log_tag/scope"
 require_relative "rails_db_log_tag/trace"
+require_relative "rails_db_log_tag/multiple_db"
 
 module RailsDbLogTag
   extend ActiveSupport::Concern
@@ -24,6 +25,10 @@ module RailsDbLogTag
     def config
       configuration.reset
       yield(configuration)
+
+      # re-attach log-subscriber
+      # in order to fix bug could not log in case of multiple databases
+      ActiveRecord::LogSubscriber.attach_to(:active_record)
     end
   end
 

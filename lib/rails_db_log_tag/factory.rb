@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "./multiple_db"
+
 module RailsDbLogTag
   class Factory
     TAGS = {
@@ -9,24 +11,21 @@ module RailsDbLogTag
 
       # db info: name|role|shard
       # DatabaseConfigurations
-      :db => ->(kclazz, format_tag = "db[name: %name, role: %role, shard: %shard]") {
-        m = Module.new do
-          define_method("proxy_all") do |*args, &block|
-            db_info = format_tag
-            ["%name", "%role", "%shard"].zip([
-              "#{kclazz.connection_pool.db_config.name}",
-              "#{ActiveRecord::Base.current_role}",
-              "#{ActiveRecord::Base.current_shard}"
-            ]).each do |key, info|
-              db_info = db_info.gsub(key, info) if db_info.include?(key)
-            end
+      :db => ->(db_configs) {
+        db_configs.each do |kclazz, format_tag|
+          RailsDbLogTag::MultipleDb.set_db_tag(kclazz, format_tag)
 
-            all.log_tag(db_info)
+          db_log_module = Module.new do
+            define_method("proxy_all") do |*args, &block|
+              db_info = RailsDbLogTag::MultipleDb.db_info(kclazz, format_tag)
+              all.log_tag(db_info)
+            end
+            delegate(*ActiveRecord::Querying::QUERYING_METHODS, to: :proxy_all)
           end
-          delegate(*ActiveRecord::Querying::QUERYING_METHODS, to: :proxy_all)
+
+          kclazz.extend(db_log_module)
         end
 
-        kclazz.extend(m)
         -> {}
       }
     }.freeze
