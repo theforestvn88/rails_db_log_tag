@@ -25,10 +25,6 @@ module RailsDbLogTag
     def config
       configuration.reset
       yield(configuration)
-
-      # re-attach log-subscriber
-      # in order to fix bug could not log in case of multiple databases
-      ActiveRecord::LogSubscriber.attach_to(:active_record)
     end
   end
 
@@ -37,7 +33,8 @@ module RailsDbLogTag
     def sql(event)
       if RailsDbLogTag.enable
         begin
-          concat_log_tags(event)
+          db_log_tags(event)
+          fixed_log_tags(event)
           trace_log_tags(event)
           parse_annotations_as_dynamic_tags(event)
         rescue => e
@@ -71,10 +68,24 @@ module RailsDbLogTag
         end
       end
       
-      def concat_log_tags(event)
+      def fixed_log_tags(event)
         prefix_tags = RailsDbLogTag.configuration.log_tags_with_color.join(" ")
         unless schema_or_explain?(event) || prefix_tags.empty?
-          event.payload[:name] = "#{prefix_tags} #{event.payload[:name]}"
+          event.payload[:name] = "#{prefix_tags}#{event.payload[:name]}"
+        end
+      end
+
+      def db_log_tags(event)
+        return if schema_or_explain?(event)
+
+        kclazz, action = event.payload[:name].split(" ")
+        if RailsDbLogTag::MultipleDb.db_tags.has_key?(kclazz)
+          _db_info = \
+            RailsDbLogTag::MultipleDb.db_info(
+              kclazz.constantize, 
+              RailsDbLogTag::MultipleDb.db_tags[kclazz]
+            )
+          event.payload[:name] = "#{_db_info} #{event.payload[:name]}"
         end
       end
 
@@ -87,6 +98,3 @@ end
 ActiveSupport.on_load(:active_record) do
   ActiveRecord::LogSubscriber.send(:include, RailsDbLogTag)
 end
-
-# TODO:
-# QUESTION: override LogSubscriber or create custom ?

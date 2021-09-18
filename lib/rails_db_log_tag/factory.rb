@@ -12,18 +12,10 @@ module RailsDbLogTag
       # db info: name|role|shard
       # DatabaseConfigurations
       :db => ->(db_configs) {
+        RailsDbLogTag::MultipleDb.reset
+
         db_configs.each do |kclazz, format_tag|
           RailsDbLogTag::MultipleDb.set_db_tag(kclazz, format_tag)
-
-          db_log_module = Module.new do
-            define_method("proxy_all") do |*args, &block|
-              db_info = RailsDbLogTag::MultipleDb.db_info(kclazz, format_tag)
-              all.log_tag(db_info)
-            end
-            delegate(*ActiveRecord::Querying::QUERYING_METHODS, to: :proxy_all)
-          end
-
-          kclazz.extend(db_log_module)
         end
 
         -> {}

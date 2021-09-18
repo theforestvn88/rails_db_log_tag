@@ -54,7 +54,7 @@ class LogTagTest < ActiveSupport::TestCase
 
     Person.first
     wait
-    assert_match(/db_role: writing DEMO/, @logger.logged(:debug).last)
+    assert_match(/DEMO db_role: writing./, @logger.logged(:debug).last)
   end
 
   def test_ignore_explain_sql

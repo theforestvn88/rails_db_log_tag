@@ -12,16 +12,17 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
     ActiveRecord::Base.logger = logger
   end
 
-  setup do
-    ActiveRecord::LogSubscriber.attach_to(:active_record)
-    RailsDbLogTag.enable = true
-  end
+  # setup do
+  #   ActiveRecord::LogSubscriber.attach_to(:active_record)
+  #   RailsDbLogTag.enable = true
+  # end
 
   def test_default_db_tag
     RailsDbLogTag.config do |config|
       config.db_tag Developer => "db[%name|%role|%shard]"
     end
     RailsDbLogTag.enable = true
+    ActiveRecord::LogSubscriber.attach_to(:active_record)
 
     ActiveRecord::Base.connected_to(role: :writing) do
       Developer.create(name: "dev01")
@@ -43,6 +44,7 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
       config.db_tag Developer => "db[%name|%role|%shard]"
     end
     RailsDbLogTag.enable = true
+    ActiveRecord::LogSubscriber.attach_to(:active_record)
 
     ActiveRecord::Base.connected_to(shard: :shard_one, role: :reading) do
       Developer.where(name: "dev02")
@@ -56,6 +58,8 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
     RailsDbLogTag.config do |config|
       config.db_tag Developer => "%shard|%role"
     end
+    RailsDbLogTag.enable = true
+    ActiveRecord::LogSubscriber.attach_to(:active_record)
 
     ActiveRecord::Base.connected_to(shard: :shard_one, role: :reading) do
       Developer.where(name: "dev02")
