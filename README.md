@@ -19,7 +19,7 @@
   ```ruby
   # config/intiializers/db_log_tags.rb
   RailsDbLogTag.config do |config|
-    config.fixed_prefix_tag "[VERSION_1.0.0]"
+    config.prefix_tag "[VERSION_1.0.0]"
   end
 
   RailsDbLogTag.enable = true
@@ -31,6 +31,72 @@
   Product.first
   # [VERSION_1.0.0] Product Load (0.3ms)  SELECT "products".* FROM "products" ...
   ```
+
+- Format Tags
+
+  ```ruby
+  # config/intiializers/db_log_tags.rb
+  RailsDbLogTag.config do |config|
+    config.db_tag Product => "|-> DB %role ->"
+  end
+
+  RailsDbLogTag.enable = true
+  ```
+
+  then the log tags will be showed as below
+
+  ```ruby
+  Product.all
+  # |-> DB writing ->  Product Load (0.3ms)  SELECT "products".* FROM "products" ...
+  ```
+
+  + color
+
+    ```ruby
+    RailsDbLogTag.config do |config|
+      config.prefix_tag "VERSION_100", color: :red
+    end
+    ```
+
+    Suppport colors:
+
+    ```ruby
+    # active_support/log_subscriber.rb
+    BLACK   = "\e[30m"
+    RED     = "\e[31m"
+    GREEN   = "\e[32m"
+    YELLOW  = "\e[33m"
+    BLUE    = "\e[34m"
+    MAGENTA = "\e[35m"
+    CYAN    = "\e[36m"
+    WHITE   = "\e[37m"
+    ```
+
+    Note that color format will follow the logic checking `colorize_logging == true` of the class `ActiveSupport::LogSubscriber`, so tags will be colorized iff you set `ActiveSupport::LogSubscriber.colorize_logging = true`
+
+- Multiple Db Tags
+
+  + log database name, shard and role
+
+    ```ruby
+    # config/intiializers/db_log_tags.rb
+    RailsDbLogTag.config do |config|
+      config.db_tag Product => "%name|%shard|%role"
+    end
+
+    Product.all
+    # primary_replica|default|reading Product Load (0.2ms)  SELECT "products".* 
+    ```
+
+  + colorize
+
+    ```ruby
+    # config/intiializers/db_log_tags.rb
+    RailsDbLogTag.config do |config|
+      config.db_tag Product => {text: "%role", color: :red},
+                    Cart => {text: "%shard", color: :yellow}
+    end
+    ```
 
 - Dynamic Tags
 
@@ -56,8 +122,8 @@
   ```ruby
   # config/intiializers/db_log_tags.rb
   RailsDbLogTag.config do |config|
-    config.fixed_prefix_tag "[VERSION_1.0.0]"
-    config.prepend_db_tag Product, "[role: %role]"
+    config.prefix_tag "[VERSION_1.0.0]"
+    config.db_tag Product => "[role: %role]"
   end
   RailsDbLogTag.enable = true
   ```
@@ -67,58 +133,14 @@
   # [USECASE-15] [VERSION_1.0.0] [role: reading] Product Load (0.3ms)  SELECT "products".* FROM "products" ...
   ```
 
-- Format Tags
-
-  ```ruby
-  # config/intiializers/db_log_tags.rb
-  RailsDbLogTag.config do |config|
-    # db role tag
-    # default format: db[name: %name, role: %s, shard: %shard]
-    config.db_tag "|-> DB %role ->"
-  end
-
-  RailsDbLogTag.enable = true
-  ```
-
-  then the log tags will be showed as below
-
-  ```ruby
-  Product.all
-  # |-> DB writing ->  Product Load (0.3ms)  SELECT "products".* FROM "products" ...
-  ```
-
-  + color
-
-    ```ruby
-    RailsDbLogTag.config do |config|
-      config.fixed_prefix_tag "VERSION_100", color: :red
-    end
-    ```
-
-    Suppport colors:
-
-    ```ruby
-    # active_support/log_subscriber.rb
-    BLACK   = "\e[30m"
-    RED     = "\e[31m"
-    GREEN   = "\e[32m"
-    YELLOW  = "\e[33m"
-    BLUE    = "\e[34m"
-    MAGENTA = "\e[35m"
-    CYAN    = "\e[36m"
-    WHITE   = "\e[37m"
-    ```
-
-    Note that color format will follow the logic checking `colorize_logging == true` of the class `ActiveSupport::LogSubscriber`, so tags will be colorized iff you set `ActiveSupport::LogSubscriber.colorize_logging = true`
-
   + dynamic colorize tags
 
-    ```ruby
-    Product.log_tag("BESTSELLER", color: :yellow).where...
-    # BESTSELLER Product Load (0.6ms)  SELECT "products". ...
-    ```
+  ```ruby
+  Product.log_tag("BESTSELLER", color: :yellow).where...
+  # BESTSELLER Product Load (0.6ms)  SELECT "products". ...
+  ```
 
-    Note: `ActiveSupport::LogSubscriber.colorize_logging` does not effect dynamic colorize tags
+  Note: `ActiveSupport::LogSubscriber.colorize_logging` does not effect dynamic colorize tags
 
 - Tracing Tags
 

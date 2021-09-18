@@ -17,7 +17,14 @@ module RailsDbLogTag
     end
 
     def db_info(kclazz, format_tag)
-      db_info_tag = format_tag
+      db_info_tag, tag_color = \
+        case
+        when format_tag.is_a?(Hash)
+          [format_tag[:text], format_tag[:color]]
+        else
+          [format_tag, nil]
+        end
+
       ["%name", "%role", "%shard"].zip([
         "#{kclazz.connection_pool.db_config.name}",
         "#{ActiveRecord::Base.current_role}",
@@ -25,7 +32,10 @@ module RailsDbLogTag
       ]).each do |key, info|
         db_info_tag = db_info_tag.gsub(key, info) if db_info_tag.include?(key)
       end
-      db_info_tag
+
+      return db_info_tag if tag_color.nil?
+
+      RailsDbLogTag::Colors.set_color(db_info_tag, tag_color) 
     end
   end
 end

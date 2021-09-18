@@ -25,9 +25,9 @@ class LogTagTest < ActiveSupport::TestCase
     assert_no_match(/DEMO/, @logger.logged(:debug).last)
   end
 
-  def test_fixed_prefix_tag
+  def test_prefix_tag
     RailsDbLogTag.config do |config|
-      config.fixed_prefix_tag "DEMO"
+      config.prefix_tag "DEMO"
     end
 
     Person.first
@@ -48,7 +48,7 @@ class LogTagTest < ActiveSupport::TestCase
 
   def test_config_multi_tags
     RailsDbLogTag.config do |config|
-      config.fixed_prefix_tag "DEMO"
+      config.prefix_tag "DEMO"
       config.db_tag Person => "db_role: %role"
     end
 
@@ -59,7 +59,7 @@ class LogTagTest < ActiveSupport::TestCase
 
   def test_ignore_explain_sql
     RailsDbLogTag.config do |config|
-      config.fixed_prefix_tag "DEMO"
+      config.prefix_tag "DEMO"
     end
 
     Person.all.explain
@@ -80,7 +80,7 @@ class LogTagTest < ActiveSupport::TestCase
   def test_colorize_tag
     ActiveSupport::LogSubscriber.colorize_logging = true
     RailsDbLogTag.config do |config|
-      config.fixed_prefix_tag "RED", color: :red
+      config.prefix_tag "RED", color: :red
     end
 
     Person.first
@@ -91,7 +91,7 @@ class LogTagTest < ActiveSupport::TestCase
   def test_not_allow_config_unknow_color
     assert_raise NameError do
       RailsDbLogTag.config do |config|
-        config.fixed_prefix_tag "PURPIL", color: :purpil
+        config.prefix_tag "PURPIL", color: :purpil
       end
     end
   end

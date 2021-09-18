@@ -56,7 +56,7 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
 
   def test_format_db_tag
     RailsDbLogTag.config do |config|
-      config.db_tag Developer => "%shard|%role"
+      config.db_tag Developer => {text: "%shard|%role", color: :red}
     end
     RailsDbLogTag.enable = true
     ActiveRecord::LogSubscriber.attach_to(:active_record)
@@ -66,6 +66,6 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
     end
     
     wait
-    assert_match(/shard_one.reading./, @logger.logged(:debug).last)
+    assert_match(/\e\[31mshard_one.reading./, @logger.logged(:debug).last)
   end
 end

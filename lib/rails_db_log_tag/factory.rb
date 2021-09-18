@@ -7,7 +7,7 @@ module RailsDbLogTag
     TAGS = {
       # one usecase come to my head is the VERSION
       # ex: "[v.1.0.1] Product Load (0.3ms)  SELECT "products".* FROM "products" ..."
-      :fixed_prefix => "%s",
+      :prefix => "%s",
 
       # db info: name|role|shard
       # DatabaseConfigurations

@@ -17,7 +17,7 @@ class DisableLogTagTest < ActiveSupport::TestCase
 
   def test_disable_gem
     RailsDbLogTag.config do |config|
-      config.fixed_prefix_tag "DEMO"
+      config.prefix_tag "DEMO"
     end
     RailsDbLogTag.enable = false
 
