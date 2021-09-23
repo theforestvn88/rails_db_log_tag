@@ -8,7 +8,6 @@
   Product.all
   # [role: reading] Product Load (0.4ms)  SELECT "products".* FROM "products" ...
   ```
-  **NOTE**: support only ActiveRecord (so far).
 
 ## Using
 
@@ -151,7 +150,7 @@
   ```ruby
   # config/intiializers/db_log_tags.rb
   RailsDbLogTag.config do |config|
-    config.trace_tag "PRODUCT-SERVICE", regexp: /service/
+    config.trace_tag "PRODUCT-SERVICE", regexp: /services\/product_.*/
   end
   RailsDbLogTag.enable = true
 
@@ -229,10 +228,6 @@
 
   + support logging db (multi) info
 
-    . role
-
-    . shard
-
     . 
 
   + trace tags
@@ -247,10 +242,6 @@
 
   + info tags
 
-    . slow queries, time consume range 
-
-    . counter
-
     .
 
   + log level
@@ -261,8 +252,4 @@
 
   + support custom logger
 
-  + support action controller / active view / action mailer / active job
-
   + benchmark
-
-  + support other ORM ?
