@@ -8,8 +8,8 @@ module RailsDbLogTag
       @@db_tags ||= {}
     end
 
-    def set_db_tag(kclazz, format_tag)
-      db_tags[kclazz.to_s] = format_tag
+    def set_db_tag(kclazz_str, format_tag)
+      db_tags[kclazz_str] = format_tag
     end
 
     def reset

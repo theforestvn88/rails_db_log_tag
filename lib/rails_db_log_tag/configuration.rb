@@ -39,11 +39,12 @@ module RailsDbLogTag
     Factory::TAGS.keys.each do |tag_key|
       tag_method_name = "#{tag_key}_tag" 
       define_method(tag_method_name) do |*args, **options|
-        if color = options&.dig(:color)
+        if color = options&.delete(:color)
           @tag_colors[tag_key] = get_color_const(color)
         end
 
-        @log_tags[tag_key] = Factory.create_tag(tag_key, *args)
+        tag_args = args.empty? ? options : args
+        @log_tags[tag_key] = Factory.create_tag(tag_key, tag_args)
       end
       alias_method "prepend_#{tag_method_name}", tag_method_name
     end

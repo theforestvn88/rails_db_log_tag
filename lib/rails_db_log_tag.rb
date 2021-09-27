@@ -78,12 +78,12 @@ module RailsDbLogTag
       def db_log_tags(event)
         return if schema_or_explain?(event)
 
-        kclazz, action = event.payload[:name].split(" ")
-        if RailsDbLogTag::MultipleDb.db_tags.has_key?(kclazz)
+        kclazz_str, action = event.payload[:name].split(" ")
+        if RailsDbLogTag::MultipleDb.db_tags.has_key?(kclazz_str)
           _db_info = \
             RailsDbLogTag::MultipleDb.db_info(
-              kclazz.constantize, 
-              RailsDbLogTag::MultipleDb.db_tags[kclazz]
+              kclazz_str.constantize, 
+              RailsDbLogTag::MultipleDb.db_tags[kclazz_str]
             )
           event.payload[:name] = "#{_db_info} #{event.payload[:name]}"
         end

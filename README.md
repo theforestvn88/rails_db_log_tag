@@ -36,7 +36,7 @@
   ```ruby
   # config/intiializers/db_log_tags.rb
   RailsDbLogTag.config do |config|
-    config.db_tag Product => "|-> DB %role ->"
+    config.db_tag "Product" => "|-> DB %role ->"
   end
 
   RailsDbLogTag.enable = true
@@ -80,7 +80,7 @@
     ```ruby
     # config/intiializers/db_log_tags.rb
     RailsDbLogTag.config do |config|
-      config.db_tag Product => "%name|%shard|%role"
+      config.db_tag "Product" => "%name|%shard|%role"
     end
 
     Product.all
@@ -92,8 +92,8 @@
     ```ruby
     # config/intiializers/db_log_tags.rb
     RailsDbLogTag.config do |config|
-      config.db_tag Product => {text: "%role", color: :red},
-                    Cart => {text: "%shard", color: :yellow}
+      config.db_tag :product => {text: "%role", color: :red},
+                    :cart => {text: "%shard", color: :yellow}
     end
     ```
 

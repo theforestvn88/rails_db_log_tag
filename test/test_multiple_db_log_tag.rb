@@ -14,7 +14,7 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
 
   def test_default_db_tag
     RailsDbLogTag.config do |config|
-      config.db_tag Developer => "db[%name|%role|%shard]"
+      config.db_tag "Developer" => "db[%name|%role|%shard]"
     end
     RailsDbLogTag.enable = true
     ActiveRecord::LogSubscriber.attach_to(:active_record)
@@ -36,7 +36,7 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
 
   def test_shard_db_tag
     RailsDbLogTag.config do |config|
-      config.db_tag Developer => "db[%name|%role|%shard]"
+      config.db_tag "Developer" => "db[%name|%role|%shard]"
     end
     RailsDbLogTag.enable = true
     ActiveRecord::LogSubscriber.attach_to(:active_record)
@@ -51,7 +51,8 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
 
   def test_format_db_tag
     RailsDbLogTag.config do |config|
-      config.db_tag Developer => {text: "%shard|%role", color: :red}
+      config.db_tag :developer => {text: "%shard|%role", color: :red},
+                    :person => {text: "%role", color: :yellow}
     end
     RailsDbLogTag.enable = true
     ActiveRecord::LogSubscriber.attach_to(:active_record)
@@ -66,7 +67,7 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
 
   def test_async
     RailsDbLogTag.config do |config|
-      config.db_tag Developer => "%name|%role"
+      config.db_tag "Developer" => "%name|%role"
     end
     RailsDbLogTag.enable = true
     ActiveRecord::LogSubscriber.attach_to(:active_record)

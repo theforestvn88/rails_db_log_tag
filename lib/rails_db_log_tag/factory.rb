@@ -14,15 +14,21 @@ module RailsDbLogTag
       :db => ->(db_configs) {
         RailsDbLogTag::MultipleDb.reset
 
-        db_configs.each do |kclazz, format_tag|
-          RailsDbLogTag::MultipleDb.set_db_tag(kclazz, format_tag)
+        db_configs.each do |kclazz_key, format_tag|
+          if kclazz_key.is_a?(Symbol) or kclazz_key.is_a?(String)
+            kclazz_str = kclazz_key.to_s.classify
+          else
+            raise ArgumentError, "kclazz should be a Symbol or String"
+          end
+
+          RailsDbLogTag::MultipleDb.set_db_tag(kclazz_str, format_tag)
         end
 
         -> {}
       }
     }.freeze
 
-    def self.create_tag(tag, *args)
+    def self.create_tag(tag, args)
       tag_formula = TAGS[tag]
       error_create_tag = "could not create tag #{tag}"
       raise ArgumentError, error_create_tag if tag_formula.nil?

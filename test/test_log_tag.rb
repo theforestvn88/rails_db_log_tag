@@ -37,7 +37,7 @@ class LogTagTest < ActiveSupport::TestCase
 
   def test_db_current_role_tag
     RailsDbLogTag.config do |config|
-      config.db_tag Person => "db_role: %role"
+      config.db_tag :person => "db_role: %role"
     end
 
     Person.first
@@ -46,10 +46,18 @@ class LogTagTest < ActiveSupport::TestCase
     assert_no_match(/db writing/, @logger.logged(:debug).last)
   end
 
+  def test_setup_invalid_db_tag
+    assert_raise ArgumentError do
+      RailsDbLogTag.config do |config|
+        config.db_tag Person => "db_role: %role"
+      end
+    end
+  end
+
   def test_config_multi_tags
     RailsDbLogTag.config do |config|
       config.prefix_tag "DEMO"
-      config.db_tag Person => "db_role: %role"
+      config.db_tag "Person" => "db_role: %role"
     end
 
     Person.first

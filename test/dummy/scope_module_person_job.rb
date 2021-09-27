@@ -7,7 +7,7 @@ class PersonJob
     Person.where(id: 1).first
   end
 
-  using RailsDbLogTag::Scope.create_refinement "PersonJob" => [Person]
+  using RailsDbLogTag::Scope.create_refinement "PersonJob" => [:person]
 
   def query_after_using_refinement
     Person.where(id: 1).first

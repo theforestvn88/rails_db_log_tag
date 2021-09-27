@@ -18,6 +18,10 @@ module RailsDbLogTag
       Module.new do
         scopes.each do |scope_tag, clazzs|
           clazzs.each do |kclazz|
+            if kclazz.is_a?(Symbol) or kclazz.is_a?(String)
+              kclazz = kclazz.to_s.classify.constantize
+            end
+
             # it's better to use refinement here
             # so set up scope tags for Person queries in a job/worker
             # will not effect Person class and 
