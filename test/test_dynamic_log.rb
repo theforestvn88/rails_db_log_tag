@@ -69,6 +69,21 @@ class DynamicLogTagTest < ActiveSupport::TestCase
     assert_no_match(/\/\* log_tag:\e\[1m\e\[31mRED\e\[0m \*\//, @logger.logged(:debug).last)
   end
 
+  def test_dynamic_tags_with_condition
+    RailsDbLogTag.config do |config|
+      config.enable_dynamic_tags = true
+    end
+
+    is_developer = true
+
+    Person.log_tag do
+      is_developer ? "> DEV >" : "> NOT DEV >"
+    end.where("name like ?", "lisa").first
+
+    wait
+    assert_match(/> DEV >/, @logger.logged(:debug).last)
+  end
+
   def test_disable_dyanmic_tags
     RailsDbLogTag.config do |config|
       config.enable_dynamic_tags = false

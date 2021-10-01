@@ -6,21 +6,13 @@ module ActiveRecord
   end
 
   class Relation
-    # TODO: 
-    # + condition (regex?)
-    #   ex: Product.log_tag(/books.price > 100/)
-    #       --> just log tag for only queries search books those have price > 100 
-    # + group
-    #   ex: with_log_tag("IT Book") do
-    #          queries ...
-    #       end
-    #
-
     Tags_Regex = /:tag:(.+):tag:/
     Empty_Annotation = /\/\*\s*\*\//
 
-    def log_tag(tag_name, options={})
+    def log_tag(tag_name=nil, options={})
       return self unless RailsDbLogTag.enable && RailsDbLogTag.configuration.enable_dynamic_tags
+
+      tag_name = yield if block_given?
 
       tag_color = options.dig(:color)
       tag_name = RailsDbLogTag::Colors.set_color(tag_name, tag_color) unless tag_color.nil?

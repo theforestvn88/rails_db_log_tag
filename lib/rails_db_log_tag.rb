@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "rails_db_log_tag/configuration"
-require_relative "rails_db_log_tag/dynamic_query_tag"
+require_relative "rails_db_log_tag/dynamic"
 require_relative "rails_db_log_tag/scope"
 require_relative "rails_db_log_tag/trace"
 require_relative "rails_db_log_tag/multiple_db"

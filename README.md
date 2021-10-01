@@ -99,7 +99,9 @@
 
 - Dynamic Tags
 
-  + With no config, dynamic tags enable by default
+  Dynamic tags are simply `annotations`, whenever you 
+
+  + With no config, dynamic tags enable by default you call `.log_tag("DYNAMIC")` you add a special annotation `/:tag:DYNAMIC:tag:/` which will be remove from annotations and be prepend as prefix of the query log.
 
   ```ruby
   Product.log_tag("DYNAMIC").where(name: "DYNAMIC")
@@ -133,6 +135,17 @@
   ```
 
   Note: `ActiveSupport::LogSubscriber.colorize_logging` does not effect dynamic colorize tags
+
+  + dynamic tags with logic conditions
+
+  ```ruby
+  # some logics
+  is_developer = true
+
+  Person.log_tag do
+    is_developer ? "> DEV >" : "> NOT DEV >"
+  end.where("name like ?", "lisa").first
+  ```
 
   + disable dynamic tags
 
