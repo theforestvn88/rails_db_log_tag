@@ -14,9 +14,7 @@ module RailsDbLogTag
   class << self
     attr_accessor :enable
     attr_accessor :configuration
-    # TODO: disable/enable dynamic tag
-    # TODO: ignored payload name, right now is [SCHEMA, EXPLAIN]
-    # TODO: cache queries ?
+    
 
     def configuration
       @configuration ||= RailsDbLogTag::Configuration.new
@@ -36,7 +34,7 @@ module RailsDbLogTag
           db_log_tags(event)
           fixed_log_tags(event)
           trace_log_tags(event)
-          parse_annotations_as_dynamic_tags(event)
+          parse_annotations_as_dynamic_tags(event) if RailsDbLogTag.configuration.enable_dynamic_tags
         rescue => e
         end
       end
@@ -49,7 +47,7 @@ module RailsDbLogTag
       def parse_annotations_as_dynamic_tags(event)
         tags = event.payload[:sql].scan(ActiveRecord::Relation::Tags_Regex).map(&:first).join(" ")
 
-        unless schema_or_explain?(event) || tags.nil?
+        unless should_ignore_log?(event) || tags.nil?
           event.payload[:name] = "#{tags} #{event.payload[:name]}" 
         end
         
@@ -59,7 +57,7 @@ module RailsDbLogTag
       end
 
       def trace_log_tags(event)
-        return if schema_or_explain?(event)
+        return if should_ignore_log?(event)
 
         trace_tags = RailsDbLogTag.configuration.trace_tags
         found_trace_tags = tracing_tags_from_caller(trace_tags, caller)
@@ -70,13 +68,13 @@ module RailsDbLogTag
       
       def fixed_log_tags(event)
         prefix_tags = RailsDbLogTag.configuration.log_tags_with_color.join(" ")
-        unless schema_or_explain?(event) || prefix_tags.empty?
+        unless should_ignore_log?(event) || prefix_tags.empty?
           event.payload[:name] = "#{prefix_tags}#{event.payload[:name]}"
         end
       end
 
       def db_log_tags(event)
-        return if schema_or_explain?(event)
+        return if should_ignore_log?(event)
 
         kclazz_str, action = event.payload[:name].split(" ")
         if RailsDbLogTag::MultipleDb.db_tags.has_key?(kclazz_str)
@@ -89,7 +87,7 @@ module RailsDbLogTag
         end
       end
 
-      def schema_or_explain?(event)
+      def should_ignore_log?(event)
         ActiveRecord::LogSubscriber::IGNORE_PAYLOAD_NAMES.include?(event.payload[:name])
       end
   end

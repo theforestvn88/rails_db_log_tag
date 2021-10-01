@@ -11,8 +11,13 @@ module RailsDbLogTag
     attr_reader  :tag_colors
     attr_reader  :trace_tags
 
+    attr_accessor :enable_dynamic_tags
+
     def initialize
       reset
+      
+      RailsDbLogTag.enable = true
+      @enable_dynamic_tags = true
     end
 
     def reset

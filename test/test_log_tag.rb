@@ -103,39 +103,4 @@ class LogTagTest < ActiveSupport::TestCase
       end
     end
   end
-
-  # DYNAMIC TEST CASES
-  
-  def test_dynamic_query_tag1
-    Person.log_tag("Usecase-6").count
-    wait
-    assert_match(/Usecase-6/, @logger.logged(:debug).last)
-    assert_no_match(/\/\* log_tag:Usecase-6 \*\//, @logger.logged(:debug).last)
-  end
-
-  def test_dynamic_query_tag2
-    Person.log_tag("Usecase-6").where(name: 'bob').first
-    wait
-    assert_match(/Usecase-6/, @logger.logged(:debug).last)
-    assert_no_match(/\/\* log_tag:Usecase-6 \*\//, @logger.logged(:debug).last)
-  end
-
-  def test_donot_remove_normal_annotations
-    Person.annotate("annotation").where(name: 'bob').first
-    wait
-    assert_match(/\/\* annotation \*\//, @logger.logged(:debug).last)
-  end
-
-  def test_not_using_dynamic_query_tag
-    Person.count
-    wait
-    assert_no_match(/Usecase-6/, @logger.logged(:debug).last)
-  end
-
-  def test_colorize_dynamic_tag
-    Person.log_tag("RED", color: :red).where(name: 'bob').first
-    wait
-    assert_match(/\e\[1m\e\[31mRED\e\[0m/, @logger.logged(:debug).last)
-    assert_no_match(/\/\* log_tag:\e\[1m\e\[31mRED\e\[0m \*\//, @logger.logged(:debug).last)
-  end
 end

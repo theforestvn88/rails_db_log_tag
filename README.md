@@ -99,14 +99,7 @@
 
 - Dynamic Tags
 
-  + With no config
-
-  ```ruby
-  # config/intiializers/db_log_tags.rb
-  RailsDbLogTag.config do |config|
-  end
-  RailsDbLogTag.enable = true
-  ```
+  + With no config, dynamic tags enable by default
 
   ```ruby
   Product.log_tag("DYNAMIC").where(name: "DYNAMIC")
@@ -140,6 +133,17 @@
   ```
 
   Note: `ActiveSupport::LogSubscriber.colorize_logging` does not effect dynamic colorize tags
+
+  + disable dynamic tags
+
+  ```ruby
+  RailsDbLogTag.config do |config|
+    config.enable_dynamic_tags = false
+  end
+
+  Product.log_tag("BESTSELLER", color: :yellow).where...
+  # Product Load (0.6ms)  SELECT "products". ...
+  ```
 
 - Tracing Tags
 
@@ -220,15 +224,7 @@
   ```
 
 
-## TODO: 
-
-  + format tags
-
-    .
-
-  + support logging db (multi) info
-
-    . 
+## TODO:
 
   + trace tags
 
@@ -236,20 +232,12 @@
 
     .
 
-  + scope tags
-
-    . 
-
-  + info tags
-
-    .
-
   + log level
 
-    . info log on production (QueryInfoLogger?)
+    . info log on production ?
 
     .
 
-  + support custom logger
+  + cache queries ?
 
   + benchmark
