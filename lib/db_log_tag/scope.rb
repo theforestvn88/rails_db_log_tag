@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-module RailsDbLogTag
+module DbLogTag
   module Scope
     # helper method to create refinement module
     # that add scope tag to record classes which be used
     #
     # ex:
     # class PersonJob
-    #   using RailsDbLogTag::Scope.create "PersonJob" => [Person]
+    #   using DbLogTag::Scope.create "PersonJob" => [Person]
     #
     # now all Person queries log, such as Person.first, 
     # will be automatically prepend scope tag "PersonJob"

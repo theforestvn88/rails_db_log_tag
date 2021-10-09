@@ -3,7 +3,7 @@
 require_relative "factory"
 require_relative "colors"
 
-module RailsDbLogTag
+module DbLogTag
   class Configuration
     include Colors
 
@@ -16,7 +16,7 @@ module RailsDbLogTag
     def initialize
       reset
       
-      RailsDbLogTag.enable = true
+      DbLogTag.enable = true
       @enable_dynamic_tags = true
     end
 

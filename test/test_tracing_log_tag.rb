@@ -1,6 +1,6 @@
 require "test_helper"
 require "active_support/log_subscriber/test_helper"
-require "rails_db_log_tag"
+require "db_log_tag"
 require_relative "./dummy/sample_db"
 require_relative "./dummy/person_service"
 
@@ -17,10 +17,10 @@ class TraceLogTagsTest < ActiveSupport::TestCase
   end
   
   def test_trace_tag
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.trace_tag "PERSON SERVICE", regexp: /person_service/
     end
-    RailsDbLogTag.enable = true
+    DbLogTag.enable = true
 
     PersonService.new.top
     wait

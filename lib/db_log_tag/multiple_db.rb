@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module RailsDbLogTag
+module DbLogTag
   module MultipleDb
     module_function
     
@@ -35,7 +35,7 @@ module RailsDbLogTag
 
       return db_info_tag if tag_color.nil?
 
-      RailsDbLogTag::Colors.set_color(db_info_tag, tag_color) 
+      DbLogTag::Colors.set_color(db_info_tag, tag_color) 
     end
   end
 end

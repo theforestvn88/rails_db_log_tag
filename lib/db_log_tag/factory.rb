@@ -2,7 +2,7 @@
 
 require_relative "./multiple_db"
 
-module RailsDbLogTag
+module DbLogTag
   class Factory
     TAGS = {
       # one usecase come to my head is the VERSION
@@ -12,7 +12,7 @@ module RailsDbLogTag
       # db info: name|role|shard
       # DatabaseConfigurations
       :db => ->(db_configs) {
-        RailsDbLogTag::MultipleDb.reset
+        DbLogTag::MultipleDb.reset
 
         db_configs.each do |kclazz_key, format_tag|
           if kclazz_key.is_a?(Symbol) or kclazz_key.is_a?(String)
@@ -21,7 +21,7 @@ module RailsDbLogTag
             raise ArgumentError, "kclazz should be a Symbol or String"
           end
 
-          RailsDbLogTag::MultipleDb.set_db_tag(kclazz_str, format_tag)
+          DbLogTag::MultipleDb.set_db_tag(kclazz_str, format_tag)
         end
 
         -> {}

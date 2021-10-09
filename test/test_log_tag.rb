@@ -1,6 +1,6 @@
 require "test_helper"
 require "active_support/log_subscriber/test_helper"
-require "rails_db_log_tag"
+require "db_log_tag"
 require_relative "./dummy/sample_db"
 
 class LogTagTest < ActiveSupport::TestCase
@@ -13,11 +13,11 @@ class LogTagTest < ActiveSupport::TestCase
 
   setup do
     ActiveRecord::LogSubscriber.attach_to(:active_record)
-    RailsDbLogTag.enable = true
+    DbLogTag.enable = true
   end
   
   def test_not_setup_gem_yet
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
     end
 
     Person.first
@@ -26,7 +26,7 @@ class LogTagTest < ActiveSupport::TestCase
   end
 
   def test_prefix_tag
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.prefix_tag "DEMO"
     end
 
@@ -36,7 +36,7 @@ class LogTagTest < ActiveSupport::TestCase
   end
 
   def test_db_current_role_tag
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.db_tag :person => "db_role: %role"
     end
 
@@ -48,14 +48,14 @@ class LogTagTest < ActiveSupport::TestCase
 
   def test_setup_invalid_db_tag
     assert_raise ArgumentError do
-      RailsDbLogTag.config do |config|
+      DbLogTag.config do |config|
         config.db_tag Person => "db_role: %role"
       end
     end
   end
 
   def test_config_multi_tags
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.prefix_tag "DEMO"
       config.db_tag "Person" => "db_role: %role"
     end
@@ -66,7 +66,7 @@ class LogTagTest < ActiveSupport::TestCase
   end
 
   def test_ignore_explain_sql
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.prefix_tag "DEMO"
     end
 
@@ -77,7 +77,7 @@ class LogTagTest < ActiveSupport::TestCase
 
   def test_could_not_create_tag
     assert_raise NoMethodError do
-      RailsDbLogTag.config do |config|
+      DbLogTag.config do |config|
         config.not_existed 
       end
     end
@@ -87,7 +87,7 @@ class LogTagTest < ActiveSupport::TestCase
 
   def test_colorize_tag
     ActiveSupport::LogSubscriber.colorize_logging = true
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.prefix_tag "RED", color: :red
     end
 
@@ -98,7 +98,7 @@ class LogTagTest < ActiveSupport::TestCase
 
   def test_not_allow_config_unknow_color
     assert_raise NameError do
-      RailsDbLogTag.config do |config|
+      DbLogTag.config do |config|
         config.prefix_tag "PURPIL", color: :purpil
       end
     end

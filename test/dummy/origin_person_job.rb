@@ -1,5 +1,4 @@
 require_relative "./person"
-require "rails_db_log_tag/scope"
 
 class OriginPersonJob
   def perform

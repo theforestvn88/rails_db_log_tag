@@ -1,6 +1,6 @@
 require "test_helper"
 require "active_support/log_subscriber/test_helper"
-require "rails_db_log_tag"
+require "db_log_tag"
 require_relative "./dummy/sample_db"
 
 class DisableLogTagTest < ActiveSupport::TestCase
@@ -16,10 +16,10 @@ class DisableLogTagTest < ActiveSupport::TestCase
   end
 
   def test_disable_gem
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.prefix_tag "DEMO"
     end
-    RailsDbLogTag.enable = false
+    DbLogTag.enable = false
 
     Person.first
     wait
@@ -27,7 +27,7 @@ class DisableLogTagTest < ActiveSupport::TestCase
   end
 
   def test_donot_add_custome_annotation_when_disable_log
-    RailsDbLogTag.enable = false
+    DbLogTag.enable = false
 
     Person.log_tag("Usecase-6").count
     wait

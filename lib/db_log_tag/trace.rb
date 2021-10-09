@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module RailsDbLogTag
+module DbLogTag
   module Trace
     # FIXME:
     def tracing_tags_from_caller(trace_tags, caller)

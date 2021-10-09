@@ -10,12 +10,12 @@ module ActiveRecord
     Empty_Annotation = /\/\*\s*\*\//
 
     def log_tag(tag_name=nil, options={})
-      return self unless RailsDbLogTag.enable && RailsDbLogTag.configuration.enable_dynamic_tags
+      return self unless DbLogTag.enable && DbLogTag.configuration.enable_dynamic_tags
 
       tag_name = yield if block_given?
 
       tag_color = options.dig(:color)
-      tag_name = RailsDbLogTag::Colors.set_color(tag_name, tag_color) unless tag_color.nil?
+      tag_name = DbLogTag::Colors.set_color(tag_name, tag_color) unless tag_color.nil?
       self.annotate_values += [":tag:#{tag_name}:tag:"]
       self
     end

@@ -1,6 +1,6 @@
 require "test_helper"
 require "active_support/log_subscriber/test_helper"
-require "rails_db_log_tag"
+require "db_log_tag"
 require_relative "./dummy/sample_db"
 require_relative "./dummy/origin_person_job"
 require_relative "./dummy/refinement_send_email_job"
@@ -20,9 +20,9 @@ class ScopeLogTagsTest < ActiveSupport::TestCase
   end
   
   def test_not_using_scope_tag
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
     end
-    RailsDbLogTag.enable = true
+    DbLogTag.enable = true
 
     OriginPersonJob.new.perform
     wait
@@ -30,9 +30,9 @@ class ScopeLogTagsTest < ActiveSupport::TestCase
   end
 
   def test_using_refinement_scope_tag
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
     end
-    RailsDbLogTag.enable = true
+    DbLogTag.enable = true
 
     SendEmailJob.new.perform
     wait
@@ -40,9 +40,9 @@ class ScopeLogTagsTest < ActiveSupport::TestCase
   end
 
   def test_using_refinement_scope_tag_apart
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
     end
-    RailsDbLogTag.enable = true
+    DbLogTag.enable = true
 
     person_job = PersonJob.new
     
@@ -56,9 +56,9 @@ class ScopeLogTagsTest < ActiveSupport::TestCase
   end
 
   def test_inherit_refinement_scope_tag
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
     end
-    RailsDbLogTag.enable = true
+    DbLogTag.enable = true
 
     developer_job = DeveloperJob.new
 
@@ -76,9 +76,9 @@ class ScopeLogTagsTest < ActiveSupport::TestCase
   end
 
   def test_other_place_will_not_effect_refinement_scope_tag
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
     end
-    RailsDbLogTag.enable = true
+    DbLogTag.enable = true
 
     person_job = PersonJob.new
     Person.where(id: 1).first

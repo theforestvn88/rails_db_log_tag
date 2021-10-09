@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module RailsDbLogTag
+module DbLogTag
   module Colors
     module_function
 

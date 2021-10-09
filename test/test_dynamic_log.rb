@@ -1,6 +1,6 @@
 require "test_helper"
 require "active_support/log_subscriber/test_helper"
-require "rails_db_log_tag"
+require "db_log_tag"
 require_relative "./dummy/sample_db"
 
 class DynamicLogTagTest < ActiveSupport::TestCase
@@ -13,11 +13,11 @@ class DynamicLogTagTest < ActiveSupport::TestCase
 
   setup do
     ActiveRecord::LogSubscriber.attach_to(:active_record)
-    RailsDbLogTag.enable = true
+    DbLogTag.enable = true
   end
 
   def test_dynamic_query_tag1
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.enable_dynamic_tags = true
     end
 
@@ -28,7 +28,7 @@ class DynamicLogTagTest < ActiveSupport::TestCase
   end
 
   def test_dynamic_query_tag2
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.enable_dynamic_tags = true
     end
 
@@ -39,7 +39,7 @@ class DynamicLogTagTest < ActiveSupport::TestCase
   end
 
   def test_donot_remove_normal_annotations
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.enable_dynamic_tags = true
     end
 
@@ -49,7 +49,7 @@ class DynamicLogTagTest < ActiveSupport::TestCase
   end
 
   def test_not_using_dynamic_query_tag
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.enable_dynamic_tags = true
     end
 
@@ -59,7 +59,7 @@ class DynamicLogTagTest < ActiveSupport::TestCase
   end
 
   def test_colorize_dynamic_tag
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.enable_dynamic_tags = true
     end
 
@@ -70,7 +70,7 @@ class DynamicLogTagTest < ActiveSupport::TestCase
   end
 
   def test_dynamic_tags_with_condition
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.enable_dynamic_tags = true
     end
 
@@ -85,7 +85,7 @@ class DynamicLogTagTest < ActiveSupport::TestCase
   end
 
   def test_disable_dyanmic_tags
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.enable_dynamic_tags = false
     end
 

@@ -1,6 +1,6 @@
 require "test_helper"
 require "active_support/log_subscriber/test_helper"
-require "rails_db_log_tag"
+require "db_log_tag"
 require_relative "./dummy/multiple_db"
 require_relative "./dummy/developer"
 
@@ -13,10 +13,10 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
   end
 
   def test_default_db_tag
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.db_tag "Developer" => "db[%name|%role|%shard]"
     end
-    RailsDbLogTag.enable = true
+    DbLogTag.enable = true
     ActiveRecord::LogSubscriber.attach_to(:active_record)
 
     ActiveRecord::Base.connected_to(role: :writing) do
@@ -35,10 +35,10 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
   end
 
   def test_shard_db_tag
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.db_tag "Developer" => "db[%name|%role|%shard]"
     end
-    RailsDbLogTag.enable = true
+    DbLogTag.enable = true
     ActiveRecord::LogSubscriber.attach_to(:active_record)
 
     ActiveRecord::Base.connected_to(shard: :shard_one, role: :reading) do
@@ -50,11 +50,11 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
   end
 
   def test_format_db_tag
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.db_tag :developer => {text: "%shard|%role", color: :red},
                     :person => {text: "%role", color: :yellow}
     end
-    RailsDbLogTag.enable = true
+    DbLogTag.enable = true
     ActiveRecord::LogSubscriber.attach_to(:active_record)
 
     ActiveRecord::Base.connected_to(shard: :shard_one, role: :reading) do
@@ -66,10 +66,10 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
   end
 
   def test_async
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.db_tag "Developer" => "%name|%role"
     end
-    RailsDbLogTag.enable = true
+    DbLogTag.enable = true
     ActiveRecord::LogSubscriber.attach_to(:active_record)
 
     latch = Concurrent::CountDownLatch.new(4)

@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
-require_relative "rails_db_log_tag/configuration"
-require_relative "rails_db_log_tag/dynamic"
-require_relative "rails_db_log_tag/scope"
-require_relative "rails_db_log_tag/trace"
-require_relative "rails_db_log_tag/multiple_db"
+require_relative "db_log_tag/configuration"
+require_relative "db_log_tag/dynamic"
+require_relative "db_log_tag/scope"
+require_relative "db_log_tag/trace"
+require_relative "db_log_tag/multiple_db"
 
-module RailsDbLogTag
+require_relative  "rails/generators/db_log_tag/install_generator"
+
+module DbLogTag
   extend ActiveSupport::Concern
   include Trace
   
@@ -17,7 +19,7 @@ module RailsDbLogTag
     
 
     def configuration
-      @configuration ||= RailsDbLogTag::Configuration.new
+      @configuration ||= DbLogTag::Configuration.new
     end
 
     def config
@@ -29,12 +31,12 @@ module RailsDbLogTag
   included do
     alias_method :origin_sql, :sql
     def sql(event)
-      if RailsDbLogTag.enable
+      if DbLogTag.enable
         begin
           db_log_tags(event)
           fixed_log_tags(event)
           trace_log_tags(event)
-          parse_annotations_as_dynamic_tags(event) if RailsDbLogTag.configuration.enable_dynamic_tags
+          parse_annotations_as_dynamic_tags(event) if DbLogTag.configuration.enable_dynamic_tags
         rescue => e
         end
       end
@@ -59,7 +61,7 @@ module RailsDbLogTag
       def trace_log_tags(event)
         return if should_ignore_log?(event)
 
-        trace_tags = RailsDbLogTag.configuration.trace_tags
+        trace_tags = DbLogTag.configuration.trace_tags
         found_trace_tags = tracing_tags_from_caller(trace_tags, caller)
         unless found_trace_tags.blank?
           event.payload[:name] = "#{found_trace_tags} #{event.payload[:name]}"
@@ -67,7 +69,7 @@ module RailsDbLogTag
       end
       
       def fixed_log_tags(event)
-        prefix_tags = RailsDbLogTag.configuration.log_tags_with_color.join(" ")
+        prefix_tags = DbLogTag.configuration.log_tags_with_color.join(" ")
         unless should_ignore_log?(event) || prefix_tags.empty?
           event.payload[:name] = "#{prefix_tags}#{event.payload[:name]}"
         end
@@ -77,11 +79,11 @@ module RailsDbLogTag
         return if should_ignore_log?(event)
 
         kclazz_str, action = event.payload[:name].split(" ")
-        if RailsDbLogTag::MultipleDb.db_tags.has_key?(kclazz_str)
+        if DbLogTag::MultipleDb.db_tags.has_key?(kclazz_str)
           _db_info = \
-            RailsDbLogTag::MultipleDb.db_info(
+            DbLogTag::MultipleDb.db_info(
               kclazz_str.constantize, 
-              RailsDbLogTag::MultipleDb.db_tags[kclazz_str]
+              DbLogTag::MultipleDb.db_tags[kclazz_str]
             )
           event.payload[:name] = "#{_db_info} #{event.payload[:name]}"
         end
@@ -94,5 +96,5 @@ module RailsDbLogTag
 end
 
 ActiveSupport.on_load(:active_record) do
-  ActiveRecord::LogSubscriber.send(:include, RailsDbLogTag)
+  ActiveRecord::LogSubscriber.send(:include, DbLogTag)
 end

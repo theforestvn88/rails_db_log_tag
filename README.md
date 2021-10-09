@@ -13,15 +13,19 @@
 
 - Install
 
+  ```ruby
+  $ rails g db_log_tag:install
+  ```
+
 - Setup
 
   ```ruby
-  # config/intiializers/db_log_tags.rb
-  RailsDbLogTag.config do |config|
+  # config/intiializers/db_log_tag.rb
+  DbLogTag.config do |config|
     config.prefix_tag "[VERSION_1.0.0]"
+    config.enable_dynamic_tags = true
   end
-
-  RailsDbLogTag.enable = true
+  DbLogTag.enable = true
   ```
   
   Demo
@@ -35,11 +39,11 @@
 
   ```ruby
   # config/intiializers/db_log_tags.rb
-  RailsDbLogTag.config do |config|
+  DbLogTag.config do |config|
     config.db_tag "Product" => "|-> DB %role ->"
   end
 
-  RailsDbLogTag.enable = true
+  DbLogTag.enable = true
   ```
 
   then the log tags will be showed as below
@@ -52,7 +56,7 @@
   + color
 
     ```ruby
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.prefix_tag "VERSION_100", color: :red
     end
     ```
@@ -79,7 +83,7 @@
 
     ```ruby
     # config/intiializers/db_log_tags.rb
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.db_tag "Product" => "%name|%shard|%role"
     end
 
@@ -91,7 +95,7 @@
 
     ```ruby
     # config/intiializers/db_log_tags.rb
-    RailsDbLogTag.config do |config|
+    DbLogTag.config do |config|
       config.db_tag :product => {text: "%role", color: :red},
                     :cart => {text: "%shard", color: :yellow}
     end
@@ -115,11 +119,11 @@
 
   ```ruby
   # config/intiializers/db_log_tags.rb
-  RailsDbLogTag.config do |config|
+  DbLogTag.config do |config|
     config.prefix_tag "[VERSION_1.0.0]"
     config.db_tag Product => "[role: %role]"
   end
-  RailsDbLogTag.enable = true
+  DbLogTag.enable = true
   ```
 
   ```ruby
@@ -150,7 +154,7 @@
   + disable dynamic tags
 
   ```ruby
-  RailsDbLogTag.config do |config|
+  DbLogTag.config do |config|
     config.enable_dynamic_tags = false
   end
 
@@ -166,10 +170,10 @@
 
   ```ruby
   # config/intiializers/db_log_tags.rb
-  RailsDbLogTag.config do |config|
+  DbLogTag.config do |config|
     config.trace_tag "PRODUCT-SERVICE", regexp: /services\/product_.*/
   end
-  RailsDbLogTag.enable = true
+  DbLogTag.enable = true
 
   # services/product_service.rb
   class ProductService
@@ -199,7 +203,7 @@
   class SendEmailJob < ActiveJob::Base
     # using refinement
     # set scope tag for only User queries
-    using RailsDbLogTag::Scope.create_refinement "[User-in-Job]" => [User]
+    using DbLogTag::Scope.create_refinement "[User-in-Job]" => [User]
 
     def perform(user_id)
       User.find(user_id) # User-in-Job  SELECT "users".* FROM ...
@@ -217,7 +221,7 @@
       Person.where(id: 1).first
     end
 
-    using RailsDbLogTag::Scope.create_refinement "UserJob" => [Person]
+    using DbLogTag::Scope.create_refinement "UserJob" => [Person]
 
     def query_after_using_refinement
       # this User query should be prepended "UserJob"
