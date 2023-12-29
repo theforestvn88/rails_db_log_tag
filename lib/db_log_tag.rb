@@ -14,10 +14,6 @@ module DbLogTag
   
   # global setting
   class << self
-    attr_accessor :enable
-    attr_accessor :configuration
-    
-
     def configuration
       @configuration ||= DbLogTag::Configuration.new
     end
@@ -31,14 +27,11 @@ module DbLogTag
   included do
     alias_method :origin_sql, :sql
     def sql(event)
-      if DbLogTag.enable
-        begin
-          db_log_tags(event)
-          fixed_log_tags(event)
-          trace_log_tags(event)
-          parse_annotations_as_dynamic_tags(event) if DbLogTag.configuration.enable_dynamic_tags
-        rescue => e
-        end
+      begin
+        db_log_tags(event)
+        trace_log_tags(event)
+        parse_annotations_as_dynamic_tags(event)
+      rescue => e
       end
       
       origin_sql(event)
@@ -67,23 +60,17 @@ module DbLogTag
           event.payload[:name] = "#{found_trace_tags} #{event.payload[:name]}"
         end
       end
-      
-      def fixed_log_tags(event)
-        prefix_tags = DbLogTag.configuration.log_tags_with_color.join(" ")
-        unless should_ignore_log?(event) || prefix_tags.empty?
-          event.payload[:name] = "#{prefix_tags}#{event.payload[:name]}"
-        end
-      end
 
       def db_log_tags(event)
         return if should_ignore_log?(event)
 
-        kclazz_str, action = event.payload[:name].split(" ")
-        if DbLogTag::MultipleDb.db_tags.has_key?(kclazz_str)
+        clazz, action = event.payload[:name].split(" ")
+        if DbLogTag::MultipleDb.db_tags.has_key?(clazz)
           _db_info = \
             DbLogTag::MultipleDb.db_info(
-              kclazz_str.constantize, 
-              DbLogTag::MultipleDb.db_tags[kclazz_str]
+              clazz, 
+              event.duration,
+              event.payload
             )
           event.payload[:name] = "#{_db_info} #{event.payload[:name]}"
         end

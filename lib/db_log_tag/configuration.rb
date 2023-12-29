@@ -1,57 +1,21 @@
 # frozen_string_literal: true
 
-require_relative "factory"
-require_relative "colors"
+require_relative "./multiple_db"
 
 module DbLogTag
   class Configuration
-    include Colors
-
-    attr_reader  :log_tags
-    attr_reader  :tag_colors
     attr_reader  :trace_tags
-
-    attr_accessor :enable_dynamic_tags
 
     def initialize
       reset
-      
-      DbLogTag.enable = true
-      @enable_dynamic_tags = true
     end
 
     def reset
-      @log_tags = {}
-      @tag_colors = {}
       @trace_tags = {}
     end
 
-    def colorize?
-      ActiveSupport::LogSubscriber.colorize_logging
-    end
-
-    def log_tags_with_color
-      @log_tags.map { |tag_key, tag_proc|
-        tag = tag_proc.call
-        if colorize? && tag_color = @tag_colors[tag_key]
-          set_color(tag, tag_color)
-        else
-          tag
-        end
-      }
-    end
-
-    Factory::TAGS.keys.each do |tag_key|
-      tag_method_name = "#{tag_key}_tag" 
-      define_method(tag_method_name) do |*args, **options|
-        if color = options&.delete(:color)
-          @tag_colors[tag_key] = get_color_const(color)
-        end
-
-        tag_args = args.empty? ? options : args
-        @log_tags[tag_key] = Factory.create_tag(tag_key, tag_args)
-      end
-      alias_method "prepend_#{tag_method_name}", tag_method_name
+    def format_tag(clazz, **options, &block)
+      DbLogTag::MultipleDb.set_db_tag(clazz, block, **options)
     end
 
     def trace_tag(tag_name, **options)

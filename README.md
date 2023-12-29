@@ -17,47 +17,34 @@
   $ rails g db_log_tag:install
   ```
 
-- Setup
-
-  ```ruby
-  # config/intiializers/db_log_tag.rb
-  DbLogTag.config do |config|
-    config.prefix_tag "[VERSION_1.0.0]"
-    config.enable_dynamic_tags = true
-  end
-  DbLogTag.enable = true
-  ```
-  
-  Demo
-
-  ```ruby
-  Product.first
-  # [VERSION_1.0.0] Product Load (0.3ms)  SELECT "products".* FROM "products" ...
-  ```
-
 - Format Tags
 
-  ```ruby
-  # config/intiializers/db_log_tags.rb
-  DbLogTag.config do |config|
-    config.db_tag "Product" => "|-> DB %role ->"
-  end
-
-  DbLogTag.enable = true
-  ```
-
-  then the log tags will be showed as below
-
-  ```ruby
-  Product.all
-  # |-> DB writing ->  Product Load (0.3ms)  SELECT "products".* FROM "products" ...
-  ```
-
-  + color
+  + format:
 
     ```ruby
+    # config/intiializers/db_log_tags.rb
     DbLogTag.config do |config|
-      config.prefix_tag "VERSION_100", color: :red
+      config.format_tag :product do |name, shard, role, duration, async, cached|
+        "#{name}|#{shard}|#{role}"
+      end
+    end
+
+    Product.all
+    # primary_replica|default|reading Product Load (0.2ms)  SELECT "products".* 
+    ```
+
+  + colorize
+
+    ```ruby
+    # config/intiializers/db_log_tags.rb
+    DbLogTag.config do |config|
+      config.format_tag :product, color: :red do |name, shard, role, duration, async, cached|
+        "#{role}"
+      end
+
+      config.format_tag :cart, color: :yellow do |name, shard, role, duration, async, cached|
+        "#{shard}"
+      end
     end
     ```
 
@@ -77,29 +64,6 @@
 
     Note that color format will follow the logic checking `colorize_logging == true` of the class `ActiveSupport::LogSubscriber`, so tags will be colorized iff you set `ActiveSupport::LogSubscriber.colorize_logging = true`
 
-- Multiple Db Tags
-
-  + log database name, shard and role
-
-    ```ruby
-    # config/intiializers/db_log_tags.rb
-    DbLogTag.config do |config|
-      config.db_tag "Product" => "%name|%shard|%role"
-    end
-
-    Product.all
-    # primary_replica|default|reading Product Load (0.2ms)  SELECT "products".* 
-    ```
-
-  + colorize
-
-    ```ruby
-    # config/intiializers/db_log_tags.rb
-    DbLogTag.config do |config|
-      config.db_tag :product => {text: "%role", color: :red},
-                    :cart => {text: "%shard", color: :yellow}
-    end
-    ```
 
 - Dynamic Tags
 

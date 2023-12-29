@@ -14,9 +14,10 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
 
   def test_default_db_tag
     DbLogTag.config do |config|
-      config.db_tag "Developer" => "db[%name|%role|%shard]"
+      config.format_tag :developer do |name, shard, role, duration, async, cached|
+        "db[#{name}|#{role}|#{shard}]"
+      end
     end
-    DbLogTag.enable = true
     ActiveRecord::LogSubscriber.attach_to(:active_record)
 
     ActiveRecord::Base.connected_to(role: :writing) do
@@ -36,9 +37,10 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
 
   def test_shard_db_tag
     DbLogTag.config do |config|
-      config.db_tag "Developer" => "db[%name|%role|%shard]"
+      config.format_tag :developer do |name, shard, role, duration, async, cached|
+        "db[#{name}|#{role}|#{shard}]"
+      end
     end
-    DbLogTag.enable = true
     ActiveRecord::LogSubscriber.attach_to(:active_record)
 
     ActiveRecord::Base.connected_to(shard: :shard_one, role: :reading) do
@@ -49,12 +51,16 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
     assert_match(/db.primary_shard_one_replica.reading.shard_one./, @logger.logged(:debug).last)
   end
 
-  def test_format_db_tag
+  def test_format_db_tag_with_color
+    ActiveSupport::LogSubscriber.colorize_logging = true
     DbLogTag.config do |config|
-      config.db_tag :developer => {text: "%shard|%role", color: :red},
-                    :person => {text: "%role", color: :yellow}
+      config.format_tag :developer, color: :red do |name, shard, role, duration, async, cached|
+        "#{shard}|#{role}"
+      end
+      config.format_tag :person, color: :yellow do |name, shard, role, duration, async, cached|
+        "#{role}"
+      end
     end
-    DbLogTag.enable = true
     ActiveRecord::LogSubscriber.attach_to(:active_record)
 
     ActiveRecord::Base.connected_to(shard: :shard_one, role: :reading) do
@@ -67,9 +73,10 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
 
   def test_async
     DbLogTag.config do |config|
-      config.db_tag "Developer" => "%name|%role"
+      config.format_tag :developer do |name, shard, role, duration, async, cached|
+        "#{name}|#{role}"
+      end
     end
-    DbLogTag.enable = true
     ActiveRecord::LogSubscriber.attach_to(:active_record)
 
     latch = Concurrent::CountDownLatch.new(4)

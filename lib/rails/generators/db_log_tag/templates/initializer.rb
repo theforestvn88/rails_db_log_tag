@@ -1,4 +1,5 @@
 DbLogTag.config do |config|
-  config.enable_dynamic_tags = true
+  # config.format_tag :user, color: :red do |name, shard, role, duration, async, cached|
+  #   "[#{name.upcase}]"
+  # end
 end
-DbLogTag.enable = true

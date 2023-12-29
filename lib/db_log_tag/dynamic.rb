@@ -10,8 +10,6 @@ module ActiveRecord
     Empty_Annotation = /\/\*\s*\*\//
 
     def log_tag(tag_name=nil, options={})
-      return self unless DbLogTag.enable && DbLogTag.configuration.enable_dynamic_tags
-
       tag_name = yield if block_given?
 
       tag_color = options.dig(:color)
