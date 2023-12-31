@@ -9,16 +9,27 @@ module DbLogTag
     end
 
     # TODO: support more colors ?
-    def get_color_const(color)
+    def get_color_code(color)
       "ActiveRecord::LogSubscriber::#{color.to_s.upcase}".constantize
     end
 
-    def set_color(text, color, bold = true)
+    FONT_MODE = {
+      bold:      1,
+      italic:    3,
+      underline: 4,
+    }
+    CLEAR = "\e[0m".freeze
+
+    def get_font_code(font_mode)
+      font_mode ? "\e[#{FONT_MODE[font_mode]}m" : ""
+    end
+
+    def set_color(text, color, font_mode)
       return text if color.nil? || !colorize?
 
-      color = get_color_const(color) if color.is_a?(Symbol)
-      bold  = bold ? get_color_const(:bold) : ""
-      "#{bold}#{color}#{text}#{get_color_const(:clear)}"
+      color = get_color_code(color) if color.is_a?(Symbol)
+      weight = get_font_code(font_mode)
+      "#{weight}#{color}#{text}#{CLEAR}"
     end
   end
 end

@@ -24,7 +24,7 @@
     ```ruby
     # config/intiializers/db_log_tags.rb
     DbLogTag.config do |config|
-      config.format_tag :product do |name, shard, role, duration, async, cached|
+      config.format_tag :product do |name, shard, role|
         "#{name}|#{shard}|#{role}"
       end
     end
@@ -38,11 +38,11 @@
     ```ruby
     # config/intiializers/db_log_tags.rb
     DbLogTag.config do |config|
-      config.format_tag :product, color: :red do |name, shard, role, duration, async, cached|
+      config.format_tag :product, color: :red, font: :italic do |name, shard, role|
         "#{role}"
       end
 
-      config.format_tag :cart, color: :yellow do |name, shard, role, duration, async, cached|
+      config.format_tag :cart, color: :yellow, font: :underline do |name, shard, role|
         "#{shard}"
       end
     end
@@ -79,50 +79,29 @@
   # <CHEAP BOOK> Product Load (0.7ms)  SELECT "products".* FROM "products" WHERE (price < 100) ...
   ```
 
-  + With config
-
-  ```ruby
-  # config/intiializers/db_log_tags.rb
-  DbLogTag.config do |config|
-    config.prefix_tag "[VERSION_1.0.0]"
-    config.db_tag Product => "[role: %role]"
-  end
-  DbLogTag.enable = true
-  ```
-
-  ```ruby
-  Product.log_tag("[USECASE-15]").first
-  # [USECASE-15] [VERSION_1.0.0] [role: reading] Product Load (0.3ms)  SELECT "products".* FROM "products" ...
-  ```
-
   + dynamic colorize tags
 
   ```ruby
-  Product.log_tag("BESTSELLER", color: :yellow).where...
-  # BESTSELLER Product Load (0.6ms)  SELECT "products". ...
+  Product.log_tag("BESTSELLER", color: :yellow, font: :bold).where...
   ```
 
   Note: `ActiveSupport::LogSubscriber.colorize_logging` does not effect dynamic colorize tags
 
-  + dynamic tags with logic conditions
+  + dynamic tags with block
 
   ```ruby
   # some logics
   is_developer = true
 
-  Person.log_tag do
-    is_developer ? "> DEV >" : "> NOT DEV >"
+  Person.log_tag do |db, shard, role|
+    "[#{db}][#{shard}][#{role}]"
   end.where("name like ?", "lisa").first
   ```
 
-  + disable dynamic tags
+  + remove dynamic tags
 
   ```ruby
-  DbLogTag.config do |config|
-    config.enable_dynamic_tags = false
-  end
-
-  Product.log_tag("BESTSELLER", color: :yellow).where...
+  Product.log_tag("BESTSELLER", color: :yellow).where(..).remove_log_tags.first
   # Product Load (0.6ms)  SELECT "products". ...
   ```
 

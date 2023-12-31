@@ -21,20 +21,17 @@ module DbLogTag
       @@db_tags = {}
     end
 
-    def db_info(clazz, duration, sql_event_payload)
+    def db_info(clazz)
       return unless db_tag_config = db_tags[clazz]
       
+      clazz_const = clazz.constantize
       db_info_tag = db_tag_config[:proc].call(
-        clazz.constantize.connection_pool.db_config.name, 
-        ActiveRecord::Base.current_shard,
-        ActiveRecord::Base.current_role, 
-        duration,
-        sql_event_payload[:async],
-        sql_event_payload[:cached]
+        clazz_const.connection_pool.db_config.name, 
+        clazz_const.current_shard,
+        clazz_const.current_role
       )
 
-      tag_color = db_tag_config[:color]
-      DbLogTag::Colors.set_color(db_info_tag, tag_color) 
+      DbLogTag::Colors.set_color(db_info_tag, db_tag_config[:color], db_tag_config[:font] || :bold) 
     end
   end
 end

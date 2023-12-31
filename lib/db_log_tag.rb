@@ -66,12 +66,7 @@ module DbLogTag
 
         clazz, action = event.payload[:name].split(" ")
         if DbLogTag::MultipleDb.db_tags.has_key?(clazz)
-          _db_info = \
-            DbLogTag::MultipleDb.db_info(
-              clazz, 
-              event.duration,
-              event.payload
-            )
+          _db_info = DbLogTag::MultipleDb.db_info(clazz)
           event.payload[:name] = "#{_db_info} #{event.payload[:name]}"
         end
       end
