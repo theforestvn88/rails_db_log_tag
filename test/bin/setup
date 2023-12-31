@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+if ! dpkg -s sqlite3; then
+  echo "Installing sqlite3..."
+  sudo apt install sqlite3
+fi
+
+ruby test/bin/init_db.rb
