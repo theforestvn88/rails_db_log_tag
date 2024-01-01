@@ -12,8 +12,8 @@ Gem::Specification.new do |s|
 
   #### Dependencies and requirements.
 
-  s.add_runtime_dependency 'activerecord',  '>= 5.0'
-  s.add_runtime_dependency 'activesupport', '>= 5.0'
+  s.add_runtime_dependency 'activerecord',  '>= 6.0'
+  s.add_runtime_dependency 'activesupport', '>= 6.0'
 
   s.add_development_dependency 'minitest'
   s.add_development_dependency 'rake'
