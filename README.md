@@ -36,6 +36,8 @@
   + colorize
 
     ```ruby
+    ActiveSupport::LogSubscriber.colorize_logging = true
+
     # config/intiializers/db_log_tags.rb
     DbLogTag.config do |config|
       config.format_tag :product, color: :red, font: :italic do |name, shard, role|
@@ -67,10 +69,6 @@
 
 - Dynamic Tags
 
-  Dynamic tags are simply `annotations`, whenever you 
-
-  + With no config, dynamic tags enable by default you call `.log_tag("DYNAMIC")` you add a special annotation `/:tag:DYNAMIC:tag:/` which will be remove from annotations and be prepend as prefix of the query log.
-
   ```ruby
   Product.log_tag("DYNAMIC").where(name: "DYNAMIC")
   # DYNAMIC Product Load (0.3ms)  SELECT "products".* FROM "products" ...
@@ -79,23 +77,19 @@
   # <CHEAP BOOK> Product Load (0.7ms)  SELECT "products".* FROM "products" WHERE (price < 100) ...
   ```
 
-  + dynamic colorize tags
+  + colorize dynamic tags
 
   ```ruby
+  ActiveSupport::LogSubscriber.colorize_logging = true
   Product.log_tag("BESTSELLER", color: :yellow, font: :bold).where...
   ```
-
-  Note: `ActiveSupport::LogSubscriber.colorize_logging` does not effect dynamic colorize tags
 
   + dynamic tags with block
 
   ```ruby
-  # some logics
-  is_developer = true
-
-  Person.log_tag do |db, shard, role|
-    "[#{db}][#{shard}][#{role}]"
-  end.where("name like ?", "lisa").first
+  Person.log_tag(color: :cyan) { |db, shard, role| "[#{db}][#{shard}][#{role}]" }
+        .where("name like ?", "lisa")
+        .first
   ```
 
   + remove dynamic tags
@@ -138,49 +132,50 @@
 
   Note: the backtrace will not include `product_service` in case of `Product.all` 
 
-- Scoping Tags
-
-  In some cases (such as for analysis purpose), you want to add a scope log tag for just only apart of your project, for example: you want to set tag only for all User queries happen on jobs (i.e SendEmailJob) and it should not effect other any User quieries in any other places.
+- Refinement Tags
 
   ```ruby
   class SendEmailJob < ActiveJob::Base
     # using refinement
-    # set scope tag for only User queries
-    using DbLogTag::Scope.create_refinement "[User-in-Job]" => [User]
+    # set refinement tag for only queries in this class
+    using DbLogTag.refinement_tag(lambda { |db, shard, role|
+      "[#{name}|#{shard}|#{role}]<SendEmailJob>"
+    }, color: :red, font: :bold)
 
     def perform(user_id)
-      User.find(user_id) # User-in-Job  SELECT "users".* FROM ...
-      Role.where ...     # SELECT "roles".* FROM ...
+      User.find(user_id) # [primary|default|writing]<SendEmailJob> SELECT "users"
+      Role.where ...     # [primary|default|writing]<SendEmailJob> SELECT "roles"
     end
   end
   ```
-  You could create scope tags for a parent class's methods and it'll effect on all children classes
+
+  As a refinement, it's scope same as Refinement's scope
 
   ```ruby
-  # user_job.rb
-  class UserJob < ActiveJob::Base
+  # user_service.rb
+  class UserService
     def query_before_using_refinement
-      # this User query should NOT be prepended "UserJob"
+      # this query should NOT be prepended refinement tag
       Person.where(id: 1).first
     end
 
-    using DbLogTag::Scope.create_refinement "UserJob" => [Person]
+    using DbLogTag.refinement_tag(lambda{ |db, shard, role| "Something" })
 
     def query_after_using_refinement
-      # this User query should be prepended "UserJob"
+      # this query should be prepended refinement tag
       Person.where(id: 1).first
     end
   end
 
   # developer_job.rb
-  class DeveloperJob < UserJob
+  class DeveloperService < UserService
   end
 
   # the log should NOT contains "UserJob"
-  DeveloperJob.new.query_before_using_refinement
+  DeveloperService.new.query_before_using_refinement
 
   # the log should contains "UserJob"
-  DeveloperJob.new.query_after_using_refinement
+  DeveloperService.new.query_after_using_refinement
   ```
 
 

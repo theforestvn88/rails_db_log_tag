@@ -2,7 +2,7 @@
 
 require_relative "db_log_tag/configuration"
 require_relative "db_log_tag/dynamic"
-require_relative "db_log_tag/scope"
+require_relative "db_log_tag/refinement"
 require_relative "db_log_tag/trace"
 require_relative "db_log_tag/multiple_db"
 

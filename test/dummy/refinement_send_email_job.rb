@@ -1,8 +1,10 @@
 require_relative "./person"
-require "db_log_tag/scope"
+require "db_log_tag"
 
 class SendEmailJob
-  using DbLogTag::Scope.create_refinement "SendEmailJob" => [Person]
+  using DbLogTag.refinement_tag(lambda {|db, shard, role|
+    "SendEmailJob"
+  }, color: :red)
 
   def perform
     Person.where(id: 1).first
