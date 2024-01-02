@@ -55,7 +55,7 @@ class DynamicLogTagTest < ActiveSupport::TestCase
     end.where("name like ?", "lisa").first
 
     wait
-    assert_match(/[primary][default][writing]/, @logger.logged(:debug).last)
+    assert_match(/.primary..default..writing./, @logger.logged(:debug).last)
   end
 
   def test_remove_dyanmic_tags

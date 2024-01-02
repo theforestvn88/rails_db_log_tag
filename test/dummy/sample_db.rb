@@ -4,8 +4,8 @@ require "active_record"
 
 require_relative "./person"
 
-bob = Person.create!(name: "bob")
-lisa = Person.create!(name: "lisa")
+Person.create!(name: "bob")
+Person.create!(name: "lisa")
 
-oop = Book.create!(name: "oop")
-ruby = Book.create!(name: "ruby")
+Book.create!(name: "oop")
+Book.create!(name: "ruby")

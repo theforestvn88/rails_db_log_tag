@@ -61,7 +61,7 @@ class ScopeLogTagsTest < ActiveSupport::TestCase
   end
 
   def test_other_place_will_not_effect_refinement_scope_tag
-    email_job = SendEmailJob.new
+    SendEmailJob.new
     Person.where(id: 1).first
     assert_no_match(/SendEmailJob/, @logger.logged(:debug).last)
   end

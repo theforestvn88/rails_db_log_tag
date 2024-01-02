@@ -1,5 +1,5 @@
 DbLogTag.config do |config|
-  # config.format_tag :user, color: :red do |name, shard, role, duration, async, cached|
-  #   "[#{name.upcase}]"
+  # config.format_tag :user, color: :red do |db, shard, role|
+  #   "[#{db}|#{shard}|#{role}]"
   # end
 end
