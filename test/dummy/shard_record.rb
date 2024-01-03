@@ -1,9 +1,9 @@
 require "active_record"
 
-ENV["RAILS_ENV"] = "default_env"
+ENV["RAILS_ENV"] = "test"
 
 config = {
-  "default_env" => {
+  "test" => {
     "primary"  => { "adapter" => "sqlite3", "database" => "test/db/primary.sqlite3" },
     "primary_replica"  => { "adapter" => "sqlite3", "database" => "test/db/primary.sqlite3", "replica" => true },
     "primary_shard_one" => { "adapter" => "sqlite3", "database" => "test/db/primary_shard_one.sqlite3" },

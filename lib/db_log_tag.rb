@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
-require_relative "db_log_tag/configuration"
+require_relative "db_log_tag/enable"
+require_relative "db_log_tag/colors"
 require_relative "db_log_tag/dynamic"
 require_relative "db_log_tag/refinement"
 require_relative "db_log_tag/multiple_db"
+require_relative "db_log_tag/configuration"
 
 require_relative  "rails/generators/db_log_tag/install_generator"
 
@@ -25,10 +27,12 @@ module DbLogTag
   included do
     alias_method :origin_sql, :sql
     def sql(event)
-      begin
-        db_log_tags(event)
-        parse_annotations_as_dynamic_tags(event)
-      rescue
+      if DbLogTag.enable?
+        begin
+          db_log_tags(event)
+          parse_annotations_as_dynamic_tags(event)
+        rescue
+        end
       end
       
       origin_sql(event)

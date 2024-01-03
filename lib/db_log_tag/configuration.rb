@@ -1,15 +1,19 @@
 # frozen_string_literal: true
 
-require_relative "./multiple_db"
-
 module DbLogTag
   class Configuration
+    attr_reader :envs
+
     def initialize
       reset
     end
 
     def reset
       DbLogTag::MultipleDb.reset
+    end
+
+    def enable_environment(envs)
+      DbLogTag.set_enable_environment(envs)
     end
 
     def format_tag(clazz, **options, &block)

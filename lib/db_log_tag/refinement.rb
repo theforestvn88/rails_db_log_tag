@@ -12,6 +12,8 @@ module DbLogTag
   # will be automatically prepend refinement tag "PersonJob"
   #
   def self.refinement_tag(refinement_proc, **options)
+    return Module.new {} unless DbLogTag.enable?
+    
     # init an anonymous module
     # that will be `using`
     Module.new do

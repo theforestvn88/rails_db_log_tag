@@ -14,6 +14,18 @@
   ```ruby
   $ rails g db_log_tag:install
   ```
+- Enable Environment
+  Default db_log_tag will enable on :development and :test.
+  You could setup on config file 
+  ```ruby
+    # config/intiializers/db_log_tags.rb
+    DbLogTag.config do |config|
+      config.enable_environment = [:stagging, :development, :test]
+      
+      # ...
+    end
+  ```
+
 
 - Format Tags
 

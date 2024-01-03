@@ -7,6 +7,10 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
   include ActiveSupport::LogSubscriber::TestHelper
   include ActiveSupport::Testing::MethodCallAssertions
 
+  setup do
+    ENV["RAILS_ENV"] = "test"
+  end
+
   def set_logger(logger)
     ActiveRecord::Base.logger = logger
   end

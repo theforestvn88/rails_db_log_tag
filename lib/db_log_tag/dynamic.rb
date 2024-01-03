@@ -12,6 +12,8 @@ module ActiveRecord
     attr_accessor :log_tags
 
     def log_tag(tag_name=nil, **options)
+      return self unless DbLogTag.enable?
+      
       if block_given?
         tag_name = yield(
           klass.connection_pool.db_config.name,

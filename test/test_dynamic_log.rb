@@ -12,6 +12,7 @@ class DynamicLogTagTest < ActiveSupport::TestCase
   end
 
   setup do
+    ENV["RAILS_ENV"] = "test"
     ActiveRecord::LogSubscriber.attach_to(:active_record)
   end
 

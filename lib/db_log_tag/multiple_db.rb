@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "./colors"
-
 module DbLogTag
   module MultipleDb
     module_function
