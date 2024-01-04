@@ -56,10 +56,8 @@ module DbLogTag
         return if should_ignore_log?(event)
 
         clazz, _ = event.payload[:name].split(" ")
-        if DbLogTag::MultipleDb.db_tags.has_key?(clazz)
-          _db_info = DbLogTag::MultipleDb.db_info(clazz)
-          event.payload[:name] = "#{_db_info} #{event.payload[:name]}"
-        end
+        _db_info = DbLogTag::MultipleDb.db_info(clazz)
+        event.payload[:name] = "#{_db_info} #{event.payload[:name]}"
       end
 
       def should_ignore_log?(event)

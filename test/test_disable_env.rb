@@ -27,7 +27,7 @@ class DynamicLogTagTest < ActiveSupport::TestCase
 
   def test_disable_db_tag
     DbLogTag.config do |config|
-      config.format_tag :developer do |name, shard, role|
+      config.db_tag :developer do |name, shard, role|
         "db[#{name}|#{role}|#{shard}]"
       end
     end

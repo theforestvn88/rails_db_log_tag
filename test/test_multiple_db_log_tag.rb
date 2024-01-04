@@ -17,7 +17,7 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
 
   def test_default_db_tag
     DbLogTag.config do |config|
-      config.format_tag :developer do |name, shard, role|
+      config.db_tag do |name, shard, role|
         "db[#{name}|#{role}|#{shard}]"
       end
     end
@@ -28,19 +28,19 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
     end
 
     wait
-    assert_match(/db.primary.writing.default./, @logger.logged(:debug)[-2])
+    assert_match(/primary.writing.default./, @logger.logged(:debug)[-2])
 
     ActiveRecord::Base.connected_to(role: :reading) do
       Developer.where(name: "dev01")
     end
 
     wait
-    assert_match(/db.primary_replica.reading.default./, @logger.logged(:debug).last)
+    assert_match(/primary_replica.reading.default./, @logger.logged(:debug).last)
   end
 
   def test_shard_db_tag
     DbLogTag.config do |config|
-      config.format_tag :developer do |name, shard, role|
+      config.db_tag :developer do |name, shard, role|
         "db[#{name}|#{role}|#{shard}]"
       end
     end
@@ -57,10 +57,14 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
   def test_format_db_tag_with_color
     ActiveSupport::LogSubscriber.colorize_logging = true
     DbLogTag.config do |config|
-      config.format_tag :developer, color: :red do |name, shard, role|
+      config.db_tag :developer do |name, shard, role|
+        "db[#{name}|#{role}|#{shard}]"
+      end
+      
+      config.db_tag :developer, color: :red do |name, shard, role|
         "#{shard}|#{role}"
       end
-      config.format_tag :person, color: :yellow do |name, shard, role|
+      config.db_tag :person, color: :yellow do |name, shard, role|
         "#{role}"
       end
     end
@@ -76,7 +80,7 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
 
   def test_async
     DbLogTag.config do |config|
-      config.format_tag :developer do |name, shard, role|
+      config.db_tag :developer do |name, shard, role|
         "#{name}|#{role}"
       end
     end

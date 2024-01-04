@@ -5,22 +5,32 @@ module DbLogTag
     module_function
     
     def db_tags
-      @@db_tags ||= {}
-    end
-
-    def set_db_tag(clazz, format_tag_proc, **options)
-      db_tags[clazz.to_s.classify] = {
-        proc: format_tag_proc,
-        **options
+      @@db_tags ||= {
+        nil => {
+          proc: lambda { |db, shard, role| "[#{db}|#{shard}|#{role}]" }
+        }
       }
     end
 
+    def set_db_tag(clazz, format_tag_proc, **options)
+      tag_config = {
+        proc: format_tag_proc,
+        **options
+      }
+
+      if clazz.nil?
+        db_tags[nil] = tag_config
+      elsif clazz.is_a?(String) or clazz.is_a?(Symbol)
+        db_tags[clazz.to_s.classify] = tag_config
+      end
+    end
+
     def reset
-      @@db_tags = {}
+      @@db_tags = nil
     end
 
     def db_info(clazz)
-      return unless db_tag_config = db_tags[clazz]
+      return unless db_tag_config = (db_tags[clazz] || db_tags[nil])
       
       clazz_const = clazz.constantize
       db_info_tag = db_tag_config[:proc].call(

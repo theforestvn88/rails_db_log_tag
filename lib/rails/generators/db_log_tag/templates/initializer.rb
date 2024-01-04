@@ -1,14 +1,13 @@
 DbLogTag.config do |config|
   # config.enable_environment = [:development, :test]
 
-  # TODO
-  # for all
-  # config.db_tag color: :red do |db, shard, role, payload|
+  # deafult for all
+  # config.db_tag do |db, shard, role|
   #   "[#{db}|#{shard}|#{role}]"
   # end
 
   # for only User
-  # config.db_tag :user, color: :red do |db, shard, role, payload|
+  # config.db_tag :user, color: :red do |db, shard, role|
   #   "[#{db}|#{shard}|#{role}]"
   # end
 end

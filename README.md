@@ -27,20 +27,29 @@
   ```
 
 
-- Format Tags
+- Db Tags
 
   + format:
 
     ```ruby
     # config/intiializers/db_log_tags.rb
     DbLogTag.config do |config|
-      config.format_tag :product do |name, shard, role|
-        "#{name}|#{shard}|#{role}"
+      # this is default
+      config.db_tag do |name, shard, role|
+        "[#{name}|#{shard}|#{role}]"
+      end
+
+      # only for Product queries
+      config.db_tag :product do |name, shard, role|
+        "ProductDB[#{name}|#{shard}|#{role}]"
       end
     end
 
+    User.all
+    # [primary|default|reading] User Load (0.2ms)  SELECT ...
+
     Product.all
-    # primary_replica|default|reading Product Load (0.2ms)  SELECT "products".* 
+    # ProductDB[replica1|shard1|reading] Product Load (0.2ms)  SELECT ...
     ```
 
   + colorize
@@ -50,11 +59,11 @@
 
     # config/intiializers/db_log_tags.rb
     DbLogTag.config do |config|
-      config.format_tag :product, color: :red, font: :italic do |name, shard, role|
+      config.db_tag :product, color: :red, font: :italic do |name, shard, role|
         "#{role}"
       end
 
-      config.format_tag :cart, color: :yellow, font: :underline do |name, shard, role|
+      config.db_tag :cart, color: :yellow, font: :underline do |name, shard, role|
         "#{shard}"
       end
     end
