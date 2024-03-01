@@ -1,6 +1,6 @@
 ## Rails db log tag
 
-  > Allow to prepend prefix `tags` before query logs to track name, shard and role of the database. 
+  > Allow to prepend prefix `tags` to the beginning of the query logs to track `name`, `shard` and `role` of the database. 
 
   ```ruby
   Product.all
@@ -95,8 +95,9 @@
 - Dynamic Tags
 
   ```ruby
-  Product.log_tag("DYNAMIC").where(name: "DYNAMIC")
-  # DYNAMIC Product Load (0.3ms)  SELECT "products".* FROM "products" ...
+  Person.log_tag(color: :cyan) { |db, shard, role| "[#{db}][#{shard}][#{role}]" }
+        .where("name like ?", "lisa")
+        .first
 
   Product.where("price < ?", 100).log_tag("<CHEAP BOOK>").first(10)
   # <CHEAP BOOK> Product Load (0.7ms)  SELECT "products".* FROM "products" WHERE (price < 100) ...
@@ -106,14 +107,6 @@
 
   ```ruby
   Product.log_tag("BESTSELLER", color: :yellow, font: :bold).where...
-  ```
-
-  + dynamic tags with block
-
-  ```ruby
-  Person.log_tag(color: :cyan) { |db, shard, role| "[#{db}][#{shard}][#{role}]" }
-        .where("name like ?", "lisa")
-        .first
   ```
 
   + remove dynamic tags
