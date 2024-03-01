@@ -2,8 +2,8 @@
 Gem::Specification.new do |s|
   s.name        = 'db_log_tag'
   s.version     = '0.0.1'
-  s.summary     = "rails activerecord querying log tag"
-  s.description = "rails activerecord querying log tag"
+  s.summary     = "rails database log tags"
+  s.description = "Allow to prepend prefix tags before query logs to track name, shard and role of the database."
   s.authors     = ["Lam Phan"]
   s.email       = 'theforestvn88@gmail.com'
   s.homepage    =

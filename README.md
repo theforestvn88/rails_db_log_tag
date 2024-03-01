@@ -12,11 +12,15 @@
 - Install
 
   ```ruby
+  # Gemfile
+  gem 'db_log_tag'
+
+  $ bundle install
   $ rails g db_log_tag:install
   ```
 - Enable Environment
   Default db_log_tag will enable on :development and :test.
-  You could setup on config file 
+  You could enable/disable environments on config file
   ```ruby
     # config/intiializers/db_log_tags.rb
     DbLogTag.config do |config|
@@ -99,7 +103,6 @@
   + colorize dynamic tags
 
   ```ruby
-  ActiveSupport::LogSubscriber.colorize_logging = true
   Product.log_tag("BESTSELLER", color: :yellow, font: :bold).where...
   ```
 
@@ -163,8 +166,3 @@
   # the log should contains "UserJob"
   DeveloperService.new.query_after_using_refinement
   ```
-
-
-## TODO:
-
-  

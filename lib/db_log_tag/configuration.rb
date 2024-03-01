@@ -12,7 +12,7 @@ module DbLogTag
       DbLogTag::MultipleDb.reset
     end
 
-    def enable_environment(envs)
+    def enable_environment=(envs)
       DbLogTag.set_enable_environment(envs)
     end
 
