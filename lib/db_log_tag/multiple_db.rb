@@ -7,7 +7,7 @@ module DbLogTag
     def db_tags
       @@db_tags ||= {
         nil => {
-          proc: lambda { |db, shard, role| "[#{db}|#{shard}|#{role}]" }
+          proc: lambda { |db, shard, role| "[shard:#{shard}|role:#{role}|db:#{db}]" }
         }
       }
     end

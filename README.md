@@ -1,10 +1,10 @@
-## Rails Db log tag
+## Rails db log tag
 
   > Allow to prepend prefix `tags` before query logs to track name, shard and role of the database. 
 
   ```ruby
   Product.all
-  # [replica1|shard1|reading] Product Load (0.4ms)  SELECT "products".* FROM "products" ...
+  # [shard:shard1|role:reading2|db:shard1_replica2] Product Load (0.4ms)  SELECT "products".* FROM "products" ...
   ```
 
 ## Using
@@ -39,18 +39,18 @@
     # config/intiializers/db_log_tags.rb
     DbLogTag.config do |config|
       # this is default
-      config.db_tag do |name, shard, role|
-        "[#{name}|#{shard}|#{role}]"
+      config.db_tag do |db, shard, role|
+        "[shard:#{shard}|role:#{role}|db:#{db}]"
       end
 
       # only for Product queries
-      config.db_tag :product do |name, shard, role|
-        "ProductDB[#{name}|#{shard}|#{role}]"
+      config.db_tag :product do |db, shard, role|
+        "ProductDB[#{db}|#{shard}|#{role}]"
       end
     end
 
     User.all
-    # [primary|default|reading] User Load (0.2ms)  SELECT ...
+    # [shard:default|role:reading|db:primary] User Load (0.2ms)  SELECT ...
 
     Product.all
     # ProductDB[replica1|shard1|reading] Product Load (0.2ms)  SELECT ...
@@ -128,7 +128,7 @@
     # using refinement
     # set refinement tag for only queries in this class
     using DbLogTag.refinement_tag(lambda { |db, shard, role|
-      "[#{name}|#{shard}|#{role}]<SendEmailJob>"
+      "[#{db}|#{shard}|#{role}]<SendEmailJob>"
     }, color: :red, font: :bold)
 
     def perform(user_id)

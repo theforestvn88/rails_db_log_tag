@@ -3,11 +3,11 @@ DbLogTag.config do |config|
 
   # # default for all
   # config.db_tag do |db, shard, role|
-  #   "[#{db}|#{shard}|#{role}]"
+  #   "[shard:#{shard}|role:#{role}|db:#{db}]"
   # end
 
-  # # for only User
+  # # for only User queries
   # config.db_tag :user, color: :red do |db, shard, role|
-  #   "[#{db}|#{shard}|#{role}]"
+  #   "[shard:#{shard}|role:#{role}|db:#{db}]"
   # end
 end

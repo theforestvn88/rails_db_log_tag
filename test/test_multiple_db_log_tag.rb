@@ -17,9 +17,6 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
 
   def test_default_db_tag
     DbLogTag.config do |config|
-      config.db_tag do |name, shard, role|
-        "db[#{name}|#{role}|#{shard}]"
-      end
     end
     ActiveRecord::LogSubscriber.attach_to(:active_record)
 
@@ -28,14 +25,14 @@ class MultipleDbLogTagTest < ActiveSupport::TestCase
     end
 
     wait
-    assert_match(/primary.writing.default./, @logger.logged(:debug)[-2])
+    assert_match(/shard.default.role.writing.db.primary/, @logger.logged(:debug)[-2])
 
     ActiveRecord::Base.connected_to(role: :reading) do
       Developer.where(name: "dev01")
     end
 
     wait
-    assert_match(/primary_replica.reading.default./, @logger.logged(:debug).last)
+    assert_match(/shard.default.role.reading.db.primary_replica/, @logger.logged(:debug).last)
   end
 
   def test_shard_db_tag
