@@ -150,7 +150,7 @@
       Person.where(id: 1).first
     end
 
-    using DbLogTag.refinement_tag(lambda{ |db, shard, role| "Something" })
+    using DbLogTag.refinement_tag(lambda{ |db, shard, role| "UserJob" })
 
     def query_after_using_refinement
       # this query should be prepended refinement tag
