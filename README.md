@@ -4,7 +4,7 @@
 
   ```ruby
   Product.all
-  # [shard:shard1|role:reading2|db:shard1_replica2] Product Load (0.4ms)  SELECT "products".* FROM "products" ...
+  # [shard:shard1|role:reading2|db:shard1_replica2] Product Load (0.4ms) SELECT "products".* ...
   ```
 
 ## Using
@@ -19,7 +19,9 @@
   $ rails g db_log_tag:install
   ```
 - Enable Environment
-  Default db_log_tag will enable on :development and :test.
+
+  Default db_log_tag will enable on `:development` and `:test`.
+  
   You could enable/disable environments on config file
   ```ruby
     # config/intiializers/db_log_tags.rb
