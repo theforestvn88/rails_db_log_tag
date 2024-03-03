@@ -16,38 +16,11 @@ class DynamicLogTagTest < ActiveSupport::TestCase
     ActiveRecord::LogSubscriber.attach_to(:active_record)
   end
 
-  def test_dynamic_query_tag1
-    Person.log_tag("Usecase-6").count
-    wait
-    assert_match(/Usecase-6/, @logger.logged(:debug).last)
-    assert_no_match(/\/\* log_tag:Usecase-6 \*\//, @logger.logged(:debug).last)
-  end
-
-  def test_dynamic_query_tag2
+  def test_dynamic_query_tag_with_name
     Person.log_tag("Usecase-6").where(name: 'bob').first
     wait
     assert_match(/Usecase-6/, @logger.logged(:debug).last)
-    assert_no_match(/\/\* log_tag:Usecase-6 \*\//, @logger.logged(:debug).last)
-  end
-
-  def test_donot_remove_normal_annotations
-    Person.annotate("annotation").where(name: 'bob').first
-    wait
-    assert_match(/\/\* annotation \*\//, @logger.logged(:debug).last)
-  end
-
-  def test_not_using_dynamic_query_tag
-    Person.count
-    wait
-    assert_no_match(/Usecase-6/, @logger.logged(:debug).last)
-  end
-
-  def test_colorize_dynamic_tag
-    ActiveSupport::LogSubscriber.colorize_logging = true
-    Person.log_tag("RED", color: :red).where(name: 'bob').first
-    wait
-    assert_match(/\e\[1m\e\[31mRED\e\[0m/, @logger.logged(:debug).last)
-    assert_no_match(/\/\* log_tag:\e\[1m\e\[31mRED\e\[0m \*\//, @logger.logged(:debug).last)
+    assert_no_match(/db./, @logger.logged(:debug).last)
   end
 
   def test_dynamic_tags_with_block
@@ -59,9 +32,36 @@ class DynamicLogTagTest < ActiveSupport::TestCase
     assert_match(/.primary..default..writing./, @logger.logged(:debug).last)
   end
 
+  def test_dynamic_query_tag_with_name_and_block
+    Person.log_tag("DynamicTags ") { |db, shard, role| "db:#{db}" }.count
+    wait
+    assert_match(/DynamicTags.db.primary/, @logger.logged(:debug).last)
+    assert_no_match(/shard./, @logger.logged(:debug).last)
+  end
+
+  def test_donot_remove_normal_annotations
+    Person.annotate("annotation").where(name: 'bob').first
+    wait
+    assert_match(/\/\* annotation \*\//, @logger.logged(:debug).last)
+  end
+
+  def test_not_using_dynamic_query_tag
+    Person.count
+    wait
+    assert_match(/shard.default.role.writing.db.primary/, @logger.logged(:debug).last)
+  end
+
+  def test_colorize_dynamic_tag
+    ActiveSupport::LogSubscriber.colorize_logging = true
+    Person.log_tag("RED", color: :red).where(name: 'bob').first
+    wait
+    assert_match(/\e\[1m\e\[31mRED\e\[0m/, @logger.logged(:debug).last)
+  end
+
   def test_remove_dyanmic_tags
     Person.log_tag("Usecase-6").where(name: 'bob').remove_log_tags.first
     wait
     assert_no_match(/Usecase-6/, @logger.logged(:debug).last)
+    assert_no_match(/shard.role.db./, @logger.logged(:debug).last)
   end
 end

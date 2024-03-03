@@ -11,22 +11,24 @@ module ActiveRecord
 
     attr_accessor :log_tags
 
-    def log_tag(tag_name=nil, **options)
+    def log_tag(tag_name="", **options)
       return self unless DbLogTag.enable?
       
       if block_given?
-        tag_name = yield(
+        tag_name += yield(
           klass.connection_pool.db_config.name,
           ActiveRecord::Base.current_shard,
           ActiveRecord::Base.current_role
         )
       end
 
-      tag_color = options.dig(:color)
-      tag_font = options.dig(:font) || :bold
-      tag_name = DbLogTag::Colors.set_color(tag_name, tag_color, tag_font) unless tag_color.nil?
-      self.annotate_values += [":tag:#{tag_name}:tag:"]
-
+      if tag_name.present?
+        tag_color = options.dig(:color)
+        tag_font = options.dig(:font) || :bold
+        tag_name = DbLogTag::Colors.set_color(tag_name, tag_color, tag_font) unless tag_color.nil?
+        self.annotate_values += [":tag:#{tag_name}:tag:"]
+      end
+      
       self
     end
 

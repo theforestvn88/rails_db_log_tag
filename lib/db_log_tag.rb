@@ -27,10 +27,11 @@ module DbLogTag
   included do
     alias_method :origin_sql, :sql
     def sql(event)
-      if DbLogTag.enable?
+      if DbLogTag.enable? && !should_ignore_log?(event)
         begin
-          db_log_tags(event)
-          parse_annotations_as_dynamic_tags(event)
+          if tags = parse_annotations_as_dynamic_tags(event) || db_log_tags(event)
+            event.payload[:name] = "#{tags} #{event.payload[:name]}"
+          end
         rescue
         end
       end
@@ -42,14 +43,13 @@ module DbLogTag
 
       def parse_annotations_as_dynamic_tags(event)
         tags = event.payload[:sql].scan(ActiveRecord::Relation::Tags_Regex).map(&:first).join(" ")
-
-        unless should_ignore_log?(event) || tags.nil?
-          event.payload[:name] = "#{tags} #{event.payload[:name]}" 
-        end
+        return unless tags.present?
         
         event.payload[:sql] = event.payload[:sql].gsub(ActiveRecord::Relation::Tags_Regex, "")
         # still keep normal annotations
         event.payload[:sql] = event.payload[:sql].gsub(ActiveRecord::Relation::Empty_Annotation, "")
+
+        tags
       end
 
       def db_log_tags(event)
@@ -57,7 +57,6 @@ module DbLogTag
 
         clazz, _ = event.payload[:name].split(" ")
         _db_info = DbLogTag::MultipleDb.db_info(clazz)
-        event.payload[:name] = "#{_db_info} #{event.payload[:name]}"
       end
 
       def should_ignore_log?(event)
