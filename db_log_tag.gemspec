@@ -1,14 +1,18 @@
 
 Gem::Specification.new do |s|
   s.name        = 'db_log_tag'
-  s.version     = '0.0.2'
+  s.version     = '0.0.3'
   s.summary     = "rails database log tags"
-  s.description = "Allow to prepend prefix tags before query logs to track name, shard and role of the database."
+  s.description = "Allow to prepend prefix tags to the beginning of the query logs to track name, shard and role of the database"
   s.authors     = ["Lam Phan"]
   s.email       = 'theforestvn88@gmail.com'
   s.homepage    =
     'https://github.com/theforestvn88/rails_db_log_tag'
   s.license       = 'MIT'
+
+  s.metadata["homepage_uri"] = s.homepage
+  s.metadata["source_code_uri"] = "https://github.com/theforestvn88/rails_db_log_tag.git"
+  s.metadata["changelog_uri"] = "https://github.com/theforestvn88/rails_db_log_tag.git"
 
   #### Dependencies and requirements.
 

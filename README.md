@@ -95,9 +95,10 @@
 - Dynamic Tags
 
   ```ruby
-  Person.log_tag(color: :cyan) { |db, shard, role| "[#{db}][#{shard}][#{role}]" }
+  Person.log_tag("DEMO ", color: :cyan) { |db, shard, role| "[#{db}][#{shard}][#{role}]" }
         .where("name like ?", "lisa")
         .first
+  # DEMO [primary][default][writing] Person Load ...
 
   Product.where("price < ?", 100).log_tag("<CHEAP BOOK>").first(10)
   # <CHEAP BOOK> Product Load (0.7ms)  SELECT "products".* FROM "products" WHERE (price < 100) ...
